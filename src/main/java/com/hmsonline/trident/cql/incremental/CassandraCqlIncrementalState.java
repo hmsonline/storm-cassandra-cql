@@ -39,7 +39,13 @@ public class CassandraCqlIncrementalState<K, V> implements State {
             Statement readStatement = mapper.read(entry.getKey());
             ResultSet resultSet = clientFactory.getSession().execute(readStatement);
             V persistedValue = mapper.currentValue(resultSet);
-            V combinedValue = aggregator.combine(entry.getValue(), persistedValue);
+            V combinedValue;
+            // TODO: more elegant solution to this issue
+            // Must be careful here as the first persisted value might not exist yet!
+            if ( persistedValue != null )
+            	combinedValue = aggregator.combine(entry.getValue(), persistedValue);
+            else 
+            	combinedValue = entry.getValue();
             Statement updateStatement = mapper.update(entry.getKey(), combinedValue);
             clientFactory.getSession().execute(updateStatement);
         }
