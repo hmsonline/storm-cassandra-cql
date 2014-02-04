@@ -7,8 +7,10 @@ import storm.trident.tuple.TridentTuple;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Clause;
+import com.datastax.driver.core.querybuilder.Assignment;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
+import com.datastax.driver.core.querybuilder.Update;
 import com.datastax.driver.core.querybuilder.Select.Selection;
 import com.hmsonline.trident.cql.incremental.CqlIncrementMapper;
 
