@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.incremental.example;
+package com.hmsonline.trident.cql;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Statement;
@@ -6,8 +6,7 @@ import com.datastax.driver.core.querybuilder.Clause;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.core.querybuilder.Update;
-import com.hmsonline.trident.cql.CassandraCqlStateFactory;
-import com.hmsonline.trident.cql.CqlClientFactory;
+import com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -18,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.*;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.
@@ -39,11 +39,11 @@ public class ConditionalUpdateTest {
         clientFactory.getSession().execute(statement);
         Select.Selection selection = QueryBuilder.select();
         selection.column("v");
-        Select selectStatement = selection.from(SalesAnalyticsMapper.KEYSPACE_NAME, SalesAnalyticsMapper.TABLE_NAME);
-        Clause clause = QueryBuilder.eq("k", k);
+        Select selectStatement = selection.from(KEYSPACE_NAME, TABLE_NAME);
+        Clause clause = QueryBuilder.eq(KEY_NAME, k);
         selectStatement.where(clause);
         ResultSet results = clientFactory.getSession().execute(selectStatement);
-        Integer actualValue = results.one().getInt("v");
+        Integer actualValue = results.one().getInt(VALUE_NAME);
         assertEquals(expectedValue, actualValue);
     }
 
@@ -51,24 +51,24 @@ public class ConditionalUpdateTest {
     public void testConditionalUpdates() throws Exception {
         Update initialStatement = QueryBuilder.update(SalesAnalyticsMapper.KEYSPACE_NAME,
                 SalesAnalyticsMapper.TABLE_NAME);
-        initialStatement.with(QueryBuilder.set("v", 10));
-        Clause clause = QueryBuilder.eq("k", "DE");
+        initialStatement.with(QueryBuilder.set(VALUE_NAME, 10));
+        Clause clause = QueryBuilder.eq(KEY_NAME, "DE");
         initialStatement.where(clause);
         this.executeAndAssert(initialStatement, "DE", 10);
 
         // Now let's conditionally update where it is true
         Update updateStatement = QueryBuilder.update(SalesAnalyticsMapper.KEYSPACE_NAME,
                 SalesAnalyticsMapper.TABLE_NAME);
-        updateStatement.with(QueryBuilder.set("v", 15));
+        updateStatement.with(QueryBuilder.set(VALUE_NAME, 15));
         updateStatement.where(clause);
-        Clause conditionalClause = QueryBuilder.eq("v", 10);
+        Clause conditionalClause = QueryBuilder.eq(VALUE_NAME, 10);
         updateStatement.onlyIf(conditionalClause);
         this.executeAndAssert(updateStatement, "DE", 15);
 
         // Now let's conditionally update where it is false
         Update conditionalStatement = QueryBuilder.update(SalesAnalyticsMapper.KEYSPACE_NAME,
                 SalesAnalyticsMapper.TABLE_NAME);
-        conditionalStatement.with(QueryBuilder.set("v", 20));
+        conditionalStatement.with(QueryBuilder.set(VALUE_NAME, 20));
         conditionalStatement.where(clause);
         conditionalStatement.onlyIf(conditionalClause);
         this.executeAndAssert(conditionalStatement, "DE", 15);

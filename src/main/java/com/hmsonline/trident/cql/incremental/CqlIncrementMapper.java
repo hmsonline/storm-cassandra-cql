@@ -9,7 +9,7 @@ public interface CqlIncrementMapper<K, V> {
 
     public Statement read(K key);
 
-    public Statement update(K key, V value);
+    public Statement update(K key, V value, V oldValue);
 
     public V currentValue(ResultSet results);
 

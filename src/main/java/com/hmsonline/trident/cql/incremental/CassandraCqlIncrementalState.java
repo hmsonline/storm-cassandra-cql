@@ -3,7 +3,6 @@ package com.hmsonline.trident.cql.incremental;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Statement;
 import com.hmsonline.trident.cql.CqlClientFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import storm.trident.operation.CombinerAggregator;
@@ -37,21 +36,32 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         // Read current value.
         for (Map.Entry<K, V> entry : aggregateValues.entrySet()) {
             Statement readStatement = mapper.read(entry.getKey());
-            ResultSet resultSet = clientFactory.getSession().execute(readStatement);
-            V persistedValue = mapper.currentValue(resultSet);
+            ResultSet results = clientFactory.getSession().execute(readStatement);
+            V persistedValue = null;
+
+            if (results != null) {
+                if (results.all().size() > 1) {
+                    LOG.error("Non-unique value came back in the ResultSet for key=[{}]", entry.getKey());
+                } else if (results.one() != null){
+                    persistedValue = mapper.currentValue(results);
+                }
+            }
+
             V combinedValue;
             // TODO: more elegant solution to this issue
             // Must be careful here as the first persisted value might not exist yet!
-            if ( persistedValue != null )
-            	combinedValue = aggregator.combine(entry.getValue(), persistedValue);
-            else 
-            	combinedValue = entry.getValue();
-            Statement updateStatement = mapper.update(entry.getKey(), combinedValue);
+            if (persistedValue != null)
+                combinedValue = aggregator.combine(entry.getValue(), persistedValue);
+            else
+                combinedValue = entry.getValue();
+            Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue);
+            LOG.debug("EXECUTING [{}]", updateStatement.toString());
             clientFactory.getSession().execute(updateStatement);
         }
     }
 
     // TODO: Do we need to synchronize this?
+
     public void aggregateValue(TridentTuple tuple, TridentCollector collector) {
         K key = mapper.getKey(tuple);
         V value = mapper.getValue(tuple);
