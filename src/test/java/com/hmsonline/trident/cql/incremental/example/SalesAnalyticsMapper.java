@@ -18,8 +18,8 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     private static final long serialVersionUID = 1L;
 
     // values assumed by the schema.cql; should make customizable by constructor
-    private static final String KEYSPACE_NAME = "mykeyspace";
-    private static final String TABLE_NAME = "incrementaltable";
+    public static final String KEYSPACE_NAME = "mykeyspace";
+    public static final String TABLE_NAME = "incrementaltable";
 
     @Override
     public Statement read(String key) {
