@@ -3,8 +3,12 @@ package com.hmsonline.trident.cql.incremental.example;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.querybuilder.*;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+
+import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.core.querybuilder.Select.Selection;
+import com.datastax.driver.core.querybuilder.Update;
 import com.hmsonline.trident.cql.incremental.CqlIncrementMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +21,6 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(SalesAnalyticsMapper.class);
 
-
     // values assumed by the schema.cql; should make customizable by constructor
     public static final String KEYSPACE_NAME = "mykeyspace";
     public static final String TABLE_NAME = "incrementaltable";
@@ -26,24 +29,17 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
 
     @Override
     public Statement read(String key) {
-        Selection selection = QueryBuilder.select();
-        selection.column("v");
-        Select statement = selection.from(KEYSPACE_NAME, TABLE_NAME);
-        Clause clause = QueryBuilder.eq(KEY_NAME, key);
-        statement.where(clause);
+        Select statement = select().column("v").from(KEYSPACE_NAME, TABLE_NAME);
+        statement.where(eq(KEY_NAME, key));
         return statement;
     }
 
     @Override
     public Statement update(String key, Number value, Number oldValue) {
         Update update = QueryBuilder.update(KEYSPACE_NAME, TABLE_NAME);
-        Assignment assignment = QueryBuilder.set(VALUE_NAME, value);
-        update.with(assignment);
-        Clause clause = QueryBuilder.eq(KEY_NAME, key);
-        update.where(clause);
+        update.with(set(VALUE_NAME, value)).where(eq(KEY_NAME, key));
         if (oldValue != null) {
-            Clause conditionalClause = QueryBuilder.eq(VALUE_NAME, oldValue);
-            update.onlyIf(conditionalClause);
+            update.onlyIf(eq(VALUE_NAME, oldValue));
         }
         return update;
     }

@@ -1,5 +1,8 @@
 package com.hmsonline.trident.cql;
 
+import com.datastax.driver.core.querybuilder.Clause;
+import com.datastax.driver.core.querybuilder.Delete;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalState;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
@@ -7,53 +10,61 @@ import com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import storm.trident.operation.builtin.Sum;
-import storm.trident.state.State;
 import storm.trident.testing.MockTridentTuple;
 import storm.trident.tuple.TridentTuple;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.*;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.
  */
 @RunWith(JUnit4.class)
-public class IncrementalStateTest {
-    private static final Logger LOG = LoggerFactory.getLogger(IncrementalStateTest.class);
+public class IncrementalStateTest extends ConditionalUpdateTest {
     private CassandraCqlIncrementalStateFactory<String, Number> stateFactory;
     private CassandraCqlIncrementalStateUpdater<String, Number> stateUpdater;
-    private Map configuration;
     private static List<String> FIELDS = Arrays.asList("price", "state", "product");
-
-    private CqlClientFactory clientFactory;
 
     public IncrementalStateTest() {
         SalesAnalyticsMapper mapper = new SalesAnalyticsMapper();
         stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper);
         stateUpdater = new CassandraCqlIncrementalStateUpdater<String, Number>();
-        configuration = new HashMap<String, String>();
-        configuration.put(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
+    }
+
+    private void clearState() {
+        Delete deleteStatement = delete().all().from(KEYSPACE_NAME, TABLE_NAME);
+        deleteStatement.where(eq(KEY_NAME, "MD"));
+        clientFactory.getSession().execute(deleteStatement);
     }
 
     @Test
     public void testStateUpdates() throws Exception {
+        clearState();
+
         // Let's get some initial state in the database
         CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>)
                 stateFactory.makeState(configuration, null, 0, 0);
+        this.incrementState(state);
+        state.commit(Long.MAX_VALUE);
+        this.assertValue("MD", 100);
+
+        // Let's create two state objects, to simulate multi-threaded/distributed operations.
+        CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>)
+                stateFactory.makeState(configuration, null, 1, 2);
+        this.incrementState(state1);
+        state.commit(Long.MAX_VALUE);
+        this.assertValue("MD", 200);
+    }
+
+    private void incrementState(CassandraCqlIncrementalState<String, Number> state) {
         MockTridentTuple mockTuple = new MockTridentTuple(FIELDS, Arrays.asList(100, "MD", "bike"));
         List<TridentTuple> mockTuples = new ArrayList<TridentTuple>();
         mockTuples.add(mockTuple);
-
         state.beginCommit(Long.MAX_VALUE);
         stateUpdater.updateState(state, mockTuples, null);
-        state.commit(Long.MAX_VALUE);
-
-
-        // Let's create two state objects, to simulate multi-threaded/distributed operations.
-        State state1 = stateFactory.makeState(configuration, null, 1, 2);
-        State state2 = stateFactory.makeState(configuration, null, 2, 2);
-
     }
 }

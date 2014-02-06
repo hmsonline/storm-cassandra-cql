@@ -7,7 +7,6 @@ import com.hmsonline.trident.cql.CqlClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import storm.trident.operation.CombinerAggregator;
-import storm.trident.operation.TridentCollector;
 import storm.trident.state.State;
 import storm.trident.tuple.TridentTuple;
 
@@ -48,7 +47,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
                 List<Row> rows = results.all();
                 if (rows.size() > 1) {
                     LOG.error("Found non-unique value for key [{}]", entry.getKey());
-                } else {
+                } else if (rows.size() == 1) {
                     persistedValue = mapper.currentValue(rows.get(0));
                     LOG.debug("Persisted value = [{}]", persistedValue);
                 }
@@ -69,11 +68,11 @@ public class CassandraCqlIncrementalState<K, V> implements State {
     }
 
     // TODO: Do we need to synchronize this? (or use Concurrent)
-    public void aggregateValue(TridentTuple tuple, TridentCollector collector) {
+    public void aggregateValue(TridentTuple tuple) {
         K key = mapper.getKey(tuple);
         V value = mapper.getValue(tuple);
         V currentValue = aggregateValues.get(key);
-        V newValue = null;
+        V newValue;
         if (currentValue == null) {
             newValue = aggregator.init(tuple);
         } else {
