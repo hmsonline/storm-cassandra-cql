@@ -2,7 +2,7 @@ package com.hmsonline.trident.cql;
 
 import com.datastax.driver.core.querybuilder.Clause;
 import com.datastax.driver.core.querybuilder.Delete;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalState;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
@@ -36,10 +36,8 @@ public class IncrementalStateTest extends ConditionalUpdateTest {
     }
 
     private void clearState() {
-        Delete.Selection selection = QueryBuilder.delete();
-        Delete deleteStatement = selection.all().from(KEYSPACE_NAME, TABLE_NAME);
-        Clause clause = QueryBuilder.eq(KEY_NAME, "MD");
-        deleteStatement.where(clause);
+        Delete deleteStatement = delete().all().from(KEYSPACE_NAME, TABLE_NAME);
+        deleteStatement.where(eq(KEY_NAME, "MD"));
         clientFactory.getSession().execute(deleteStatement);
     }
 
