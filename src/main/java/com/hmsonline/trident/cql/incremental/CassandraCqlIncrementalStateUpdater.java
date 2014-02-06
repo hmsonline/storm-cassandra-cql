@@ -29,7 +29,7 @@ public class CassandraCqlIncrementalStateUpdater<K, V> implements StateUpdater<C
     public void updateState(CassandraCqlIncrementalState<K, V> state, List<TridentTuple> tuples,
             TridentCollector collector) {
         for (TridentTuple tuple : tuples) {
-            state.aggregateValue(tuple, collector);
+            state.aggregateValue(tuple);
         }
     }
 }

@@ -25,18 +25,16 @@ import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper
 @RunWith(JUnit4.class)
 public class ConditionalUpdateTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConditionalUpdateTest.class);
-
-    private CqlClientFactory clientFactory;
+    public CqlClientFactory clientFactory;
+    public Map<String, String> configuration;
 
     public ConditionalUpdateTest() {
-        Map<String, String> configuration = new HashMap<String, String>();
+        configuration = new HashMap<String, String>();
         configuration.put(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
         clientFactory = new CqlClientFactory(configuration);
     }
 
-    public void executeAndAssert(Statement statement, String k, Integer expectedValue) {
-        LOG.debug("EXECUTING [{}]", statement.toString());
-        clientFactory.getSession().execute(statement);
+    public void assertValue(String k, Integer expectedValue){
         Select.Selection selection = QueryBuilder.select();
         selection.column("v");
         Select selectStatement = selection.from(KEYSPACE_NAME, TABLE_NAME);
@@ -45,6 +43,12 @@ public class ConditionalUpdateTest {
         ResultSet results = clientFactory.getSession().execute(selectStatement);
         Integer actualValue = results.one().getInt(VALUE_NAME);
         assertEquals(expectedValue, actualValue);
+    }
+
+    public void executeAndAssert(Statement statement, String k, Integer expectedValue) {
+        LOG.debug("EXECUTING [{}]", statement.toString());
+        clientFactory.getSession().execute(statement);
+        this.assertValue(k, expectedValue);
     }
 
     @Test
