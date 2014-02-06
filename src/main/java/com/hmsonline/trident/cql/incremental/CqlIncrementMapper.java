@@ -1,5 +1,6 @@
 package com.hmsonline.trident.cql.incremental;
 
+import com.datastax.driver.core.Row;
 import storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.ResultSet;
@@ -9,9 +10,9 @@ public interface CqlIncrementMapper<K, V> {
 
     public Statement read(K key);
 
-    public Statement update(K key, V value);
+    public Statement update(K key, V value, V oldValue);
 
-    public V currentValue(ResultSet results);
+    public V currentValue(Row row);
 
     public K getKey(TridentTuple tuple);
 

@@ -14,6 +14,7 @@ import com.datastax.driver.core.Statement;
 
 public class CassandraCqlState implements State {
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlState.class);
+
     private CqlClientFactory clientFactory;
     List<Statement> statements = new ArrayList<Statement>();
 
