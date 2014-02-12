@@ -14,16 +14,3 @@ CREATE TABLE incrementaltable (
     v int,
     primary key (k)
 );
-
-CREATE TABLE wordcounttable (
-	word text,
-	count int,
-	primary key(word)
-);
-
-CREATE TABLE multikeytable (
-	k1 text,
-	k2 text,
-	v1 int,
-	primary key (k1, k2)
-);

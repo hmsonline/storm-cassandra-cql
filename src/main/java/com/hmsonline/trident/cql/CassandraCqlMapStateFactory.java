@@ -30,6 +30,7 @@ import com.hmsonline.trident.cql.CassandraCqlMapState.Options;
 public class CassandraCqlMapStateFactory implements StateFactory {
 	private static final long serialVersionUID = 1L;
 	private CqlClientFactory clientFactory;
+	private CqlTupleMapper mapper;
 	private StateType stateType;
     private Options<?> options;
     
@@ -42,10 +43,10 @@ public class CassandraCqlMapStateFactory implements StateFactory {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public CassandraCqlMapStateFactory(CqlClientFactory clientFactory, StateType stateType, Options options) {
-    	this.clientFactory = clientFactory;
+    public CassandraCqlMapStateFactory(CqlTupleMapper mapper, StateType stateType, Options options) {
         this.stateType = stateType;
         this.options = options;
+        this.mapper = mapper;
 
         if (this.options.serializer == null) {
             this.options.serializer = DEFAULT_SERIALZERS.get(stateType);
@@ -57,9 +58,15 @@ public class CassandraCqlMapStateFactory implements StateFactory {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public State makeState(Map conf, IMetricsContext metrics, int partitionIndex, int numPartitions) {
-        CassandraCqlMapState state = new CassandraCqlMapState(clientFactory, options, conf);
-
+    public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {
+    	// worth synchronizing here?
+    	if (clientFactory == null){
+    		clientFactory = new CqlClientFactory(configuration);
+    	}
+    	
+        CassandraCqlMapState state = new CassandraCqlMapState(clientFactory, mapper, options, configuration);
+        state.registerMetrics(configuration, metrics);
+        
         CachedMap cachedMap = new CachedMap(state, options.localCacheSize);
 
         MapState mapState;
