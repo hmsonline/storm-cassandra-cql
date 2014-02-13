@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import storm.trident.TridentState;
 import storm.trident.TridentTopology;
-import storm.trident.operation.builtin.Count;
 import storm.trident.operation.builtin.FilterNull;
 import storm.trident.operation.builtin.MapGet;
 import storm.trident.operation.builtin.Sum;
@@ -17,7 +16,6 @@ import backtype.storm.LocalDRPC;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.DRPCClient;
 
 import com.hmsonline.trident.cql.CassandraCqlMapState;
 import com.hmsonline.trident.cql.CassandraCqlStateFactory;
@@ -25,7 +23,8 @@ import com.hmsonline.trident.cql.CassandraCqlStateFactory;
 public class WordCountTopology {
     private static final Logger LOG = LoggerFactory.getLogger(WordCountTopology.class);
 
-    public static StormTopology buildTopology(LocalDRPC drpc) {
+    @SuppressWarnings("unchecked")
+	public static StormTopology buildTopology(LocalDRPC drpc) {
         LOG.info("Building topology.");
         TridentTopology topology = new TridentTopology();
         
@@ -37,12 +36,18 @@ public class WordCountTopology {
                 new Values("how many apples can you eat", source));
         spout.setCycle(true);
         
+        // Quick note on an interesting error I encountered regarding using Count() as an aggregator:
+        // Count utilizes an aggregator that updates values with a Long type. As you might notice, schema.cql
+        // stores the count as an integer datatype within the wordcounttable. To remedy this issue, ensure
+        // that your input fields datatypes are consistent with your persistent aggregation function. 
+        // IntegerCount is exactly the same as storm.trident.operation.builtin.Count but instead has the
+        // Integer as its field.
         TridentState wordCounts =
         	     topology.newStream("spout1", spout)
         	       .each(new Fields("sentence"), new Split(), new Fields("word", " source"))
         	       .groupBy(new Fields("word"))
         	       .persistentAggregate(CassandraCqlMapState.nonTransactional(new WordCountMapper()), 
-        	    		   new Count(), new Fields("count"))
+        	    		   new IntegerCount(), new Fields("count"))
         	       .parallelismHint(6);
         
         topology.newDRPCStream("words", drpc)

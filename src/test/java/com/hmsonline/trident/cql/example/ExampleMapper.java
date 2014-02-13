@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import storm.trident.tuple.TridentTuple;
 
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
@@ -21,19 +22,6 @@ public class ExampleMapper implements CqlTupleMapper, Serializable {
         return statement;
     }
 
-	@Override
-	public Object get(Object key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void put(Object key, Object value) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public Statement map(TridentTuple tuple, Object value) {
 		// TODO Auto-generated method stub
 		return null;
@@ -41,6 +29,18 @@ public class ExampleMapper implements CqlTupleMapper, Serializable {
 
 	@Override
 	public Statement retrieve(Object key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Statement map(Object key, Object value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object getValue(Row row) {
 		// TODO Auto-generated method stub
 		return null;
 	}
