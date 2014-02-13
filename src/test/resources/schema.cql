@@ -16,9 +16,10 @@ CREATE TABLE incrementaltable (
 );
 
 CREATE TABLE wordcounttable (
+	source text,
 	word text,
 	count int,
-	primary key(word)
+	primary key(source, word)
 );
 
 CREATE TABLE multikeytable (
