@@ -1,14 +1,13 @@
 package com.hmsonline.trident.cql;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author boneill
@@ -24,8 +23,8 @@ public class CqlClientFactory {
         String hostProperty = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
         String[] hosts = hostProperty.split(";");
         try {
-            if (LOG.isDebugEnabled()){
-                for (String host : hosts){
+            if (LOG.isDebugEnabled()) {
+                for (String host : hosts) {
                     LOG.debug("Connecting to [" + host + "]");
                 }
             }

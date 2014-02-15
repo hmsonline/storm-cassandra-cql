@@ -33,7 +33,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         aggregateValues = new HashMap<K, V>();
     }
 
-    private void applyUpdate(Statement updateStatement){
+    private void applyUpdate(Statement updateStatement) {
         LOG.debug("APPLYING [{}]", updateStatement.toString());
         boolean applied = false;
         int attempts = 0;
@@ -42,6 +42,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
             Row row = results.one();
             if (row != null)
                 applied = row.getBool("[applied]");
+            attempts++;
         }
     }
 

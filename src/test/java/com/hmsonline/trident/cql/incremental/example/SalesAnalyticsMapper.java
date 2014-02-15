@@ -1,13 +1,9 @@
 package com.hmsonline.trident.cql.incremental.example;
 
-import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
-import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-
 import com.datastax.driver.core.querybuilder.Select;
-import com.datastax.driver.core.querybuilder.Select.Selection;
 import com.datastax.driver.core.querybuilder.Update;
 import com.hmsonline.trident.cql.incremental.CqlIncrementMapper;
 import org.slf4j.Logger;
@@ -15,7 +11,8 @@ import org.slf4j.LoggerFactory;
 import storm.trident.tuple.TridentTuple;
 
 import java.io.Serializable;
-import java.util.List;
+
+import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 
 public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>, Serializable {
     private static final long serialVersionUID = 1L;

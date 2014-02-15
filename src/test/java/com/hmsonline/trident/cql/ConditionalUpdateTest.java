@@ -1,6 +1,5 @@
 package com.hmsonline.trident.cql;
 
-import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;

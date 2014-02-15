@@ -1,13 +1,12 @@
 package com.hmsonline.trident.cql;
 
-import java.util.Map;
-
+import backtype.storm.task.IMetricsContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import storm.trident.state.State;
 import storm.trident.state.StateFactory;
-import backtype.storm.task.IMetricsContext;
+
+import java.util.Map;
 
 @SuppressWarnings("rawtypes")
 public class CassandraCqlStateFactory implements StateFactory {
@@ -17,12 +16,12 @@ public class CassandraCqlStateFactory implements StateFactory {
     private static CqlClientFactory clientFactory;
 
     @Override
-    public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {    	
-    	// worth synchronizing here?
-    	if (clientFactory == null){
-    		clientFactory = new CqlClientFactory(configuration);
-    	}
-		LOG.debug("Creating State for partition [{}] of [{}]", new Object[]{partitionIndex, numPartitions});		
+    public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {
+        // worth synchronizing here?
+        if (clientFactory == null) {
+            clientFactory = new CqlClientFactory(configuration);
+        }
+        LOG.debug("Creating State for partition [{}] of [{}]", new Object[]{partitionIndex, numPartitions});
         return new CassandraCqlState(CassandraCqlStateFactory.clientFactory);
     }
 }
