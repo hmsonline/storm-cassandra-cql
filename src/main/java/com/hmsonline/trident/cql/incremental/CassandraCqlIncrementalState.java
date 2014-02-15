@@ -20,6 +20,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
     private CombinerAggregator<V> aggregator;
     private CqlIncrementMapper<K, V> mapper;
     private Map<K, V> aggregateValues;
+    public static int MAX_ATTEMPTS = 10;
 
     public CassandraCqlIncrementalState(CqlClientFactory clientFactory, CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper) {
         this.clientFactory = clientFactory;
@@ -30,6 +31,18 @@ public class CassandraCqlIncrementalState<K, V> implements State {
     @Override
     public void beginCommit(Long txid) {
         aggregateValues = new HashMap<K, V>();
+    }
+
+    private void applyUpdate(Statement updateStatement){
+        LOG.debug("APPLYING [{}]", updateStatement.toString());
+        boolean applied = false;
+        int attempts = 0;
+        while (!applied && attempts < MAX_ATTEMPTS) {
+            ResultSet results = clientFactory.getSession().execute(updateStatement);
+            Row row = results.one();
+            if (row != null)
+                applied = row.getBool("[applied]");
+        }
     }
 
     @Override
@@ -59,9 +72,9 @@ public class CassandraCqlIncrementalState<K, V> implements State {
                     combinedValue = aggregator.combine(entry.getValue(), persistedValue);
                 else
                     combinedValue = entry.getValue();
+
                 Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue);
-                LOG.debug("EXECUTING [{}]", updateStatement.toString());
-                clientFactory.getSession().execute(updateStatement);
+                applyUpdate(updateStatement);
             }
 
         }

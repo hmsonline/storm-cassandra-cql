@@ -1,8 +1,9 @@
 package com.hmsonline.trident.cql;
 
+import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
-import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.core.querybuilder.Update;
 import org.junit.Test;
@@ -14,8 +15,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.
@@ -25,6 +27,7 @@ public class ConditionalUpdateTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConditionalUpdateTest.class);
     public CqlClientFactory clientFactory;
     public Map<String, String> configuration;
+    public String APPLIED_COLUMN = "[applied]";
 
     public ConditionalUpdateTest() {
         configuration = new HashMap<String, String>();
@@ -32,7 +35,7 @@ public class ConditionalUpdateTest {
         clientFactory = new CqlClientFactory(configuration);
     }
 
-    public void assertValue(String k, Integer expectedValue){
+    public void assertValue(String k, Integer expectedValue) {
         Select selectStatement = select().column("v").from(KEYSPACE_NAME, TABLE_NAME);
         selectStatement.where(eq(KEY_NAME, k));
         ResultSet results = clientFactory.getSession().execute(selectStatement);
@@ -42,7 +45,10 @@ public class ConditionalUpdateTest {
 
     public void executeAndAssert(Statement statement, String k, Integer expectedValue) {
         LOG.debug("EXECUTING [{}]", statement.toString());
-        clientFactory.getSession().execute(statement);
+        ResultSet results = clientFactory.getSession().execute(statement);
+        Row row = results.one();
+        if (row != null)
+            LOG.debug("APPLIED?[{}]", row.getBool("[applied]"));
         this.assertValue(k, expectedValue);
     }
 
