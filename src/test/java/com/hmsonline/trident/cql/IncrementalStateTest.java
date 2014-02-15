@@ -1,8 +1,6 @@
 package com.hmsonline.trident.cql;
 
-import com.datastax.driver.core.querybuilder.Clause;
 import com.datastax.driver.core.querybuilder.Delete;
-import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalState;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
@@ -18,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.*;
 
 /**
@@ -41,25 +41,27 @@ public class IncrementalStateTest extends ConditionalUpdateTest {
         clientFactory.getSession().execute(deleteStatement);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testStateUpdates() throws Exception {
         clearState();
 
         // Let's get some initial state in the database
         CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>)
-                stateFactory.makeState(configuration, null, 0, 0);
+                stateFactory.makeState(configuration, null, 5, 50);
         this.incrementState(state);
         state.commit(Long.MAX_VALUE);
         this.assertValue("MD", 100);
 
         // Let's create two state objects, to simulate multi-threaded/distributed operations.
         CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>)
-                stateFactory.makeState(configuration, null, 1, 2);
+                stateFactory.makeState(configuration, null, 55, 122);
         this.incrementState(state1);
         state.commit(Long.MAX_VALUE);
         this.assertValue("MD", 200);
     }
 
+    @SuppressWarnings("unchecked")
     private void incrementState(CassandraCqlIncrementalState<String, Number> state) {
         MockTridentTuple mockTuple = new MockTridentTuple(FIELDS, Arrays.asList(100, "MD", "bike"));
         List<TridentTuple> mockTuples = new ArrayList<TridentTuple>();

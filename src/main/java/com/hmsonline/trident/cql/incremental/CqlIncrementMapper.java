@@ -1,10 +1,8 @@
 package com.hmsonline.trident.cql.incremental;
 
 import com.datastax.driver.core.Row;
-import storm.trident.tuple.TridentTuple;
-
-import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Statement;
+import storm.trident.tuple.TridentTuple;
 
 public interface CqlIncrementMapper<K, V> {
 
