@@ -8,16 +8,16 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.griddelta</groupId>
+    <groupId>com.hmsonline</groupId>
     <artifactId>storm-cassandra-cql</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Storm Cassandra CQL Support</name>
     <description>Storm Cassandra CQL Support</description>
 
     <scm>
-        <connection>scm:git:git@github.com:griddelta/storm-cassandra-cql.git</connection>
-        <developerConnection>scm:git:git@github.com:griddelta/storm-cassandra-cql.git</developerConnection>
-        <url>:git@github.com:griddelta/storm-cassandracql.git</url>
+        <connection>scm:git:git@github.com:hmsonline/storm-cassandra-cql.git</connection>
+        <developerConnection>scm:git:git@github.com:hmsonline/storm-cassandra-cql.git</developerConnection>
+        <url>:git@github.com:hmsonline/storm-cassandra-cql.git</url>
     </scm>
 
     <developers>
