@@ -1,16 +1,19 @@
 package com.hmsonline.trident.cql.example;
 
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.querybuilder.Update;
-import com.hmsonline.trident.cql.CqlTupleMapper;
-import storm.trident.tuple.TridentTuple;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.set;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.update;
 
 import java.io.Serializable;
 
-import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
+import storm.trident.tuple.TridentTuple;
 
-public class ExampleMapper implements CqlTupleMapper, Serializable {
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Update;
+import com.hmsonline.trident.cql.mappers.CqlRowMapper;
+
+public class ExampleMapper implements CqlRowMapper<Object, Object>, Serializable {
     private static final long serialVersionUID = 1L;
 
     public Statement map(TridentTuple tuple) {

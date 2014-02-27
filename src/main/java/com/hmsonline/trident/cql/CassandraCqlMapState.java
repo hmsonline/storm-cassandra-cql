@@ -1,25 +1,48 @@
 package com.hmsonline.trident.cql;
 
-import backtype.storm.Config;
-import backtype.storm.metric.api.CountMetric;
-import backtype.storm.task.IMetricsContext;
-import backtype.storm.topology.ReportedFailedException;
-import com.datastax.driver.core.*;
-import com.datastax.driver.core.BatchStatement.Type;
-import com.datastax.driver.core.exceptions.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import storm.trident.state.OpaqueValue;
-import storm.trident.state.StateFactory;
-import storm.trident.state.StateType;
-import storm.trident.state.TransactionalValue;
-import storm.trident.state.map.IBackingMap;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import storm.trident.state.OpaqueValue;
+import storm.trident.state.StateFactory;
+import storm.trident.state.StateType;
+import storm.trident.state.TransactionalValue;
+import storm.trident.state.map.IBackingMap;
+import backtype.storm.Config;
+import backtype.storm.metric.api.CountMetric;
+import backtype.storm.task.IMetricsContext;
+import backtype.storm.topology.ReportedFailedException;
+
+import com.datastax.driver.core.BatchStatement;
+import com.datastax.driver.core.BatchStatement.Type;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.exceptions.AlreadyExistsException;
+import com.datastax.driver.core.exceptions.AuthenticationException;
+import com.datastax.driver.core.exceptions.DriverException;
+import com.datastax.driver.core.exceptions.DriverInternalError;
+import com.datastax.driver.core.exceptions.InvalidConfigurationInQueryException;
+import com.datastax.driver.core.exceptions.InvalidQueryException;
+import com.datastax.driver.core.exceptions.InvalidTypeException;
+import com.datastax.driver.core.exceptions.QueryExecutionException;
+import com.datastax.driver.core.exceptions.QueryTimeoutException;
+import com.datastax.driver.core.exceptions.QueryValidationException;
+import com.datastax.driver.core.exceptions.ReadTimeoutException;
+import com.datastax.driver.core.exceptions.SyntaxError;
+import com.datastax.driver.core.exceptions.TraceRetrievalException;
+import com.datastax.driver.core.exceptions.TruncateException;
+import com.datastax.driver.core.exceptions.UnauthorizedException;
+import com.datastax.driver.core.exceptions.UnavailableException;
+import com.datastax.driver.core.exceptions.WriteTimeoutException;
+import com.hmsonline.trident.cql.mappers.CqlRowMapper;
 
 /**
  * @param <T> The generic state to back
@@ -42,35 +65,35 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     /////////////////////////////////////////////
 
     @SuppressWarnings("rawtypes")
-    public static StateFactory opaque(CqlTupleMapper mapper) {
+    public static StateFactory opaque(CqlRowMapper mapper) {
         Options<OpaqueValue> options = new Options<OpaqueValue>();
         return opaque(mapper, options);
     }
 
     @SuppressWarnings("rawtypes")
-    public static StateFactory opaque(CqlTupleMapper mapper, Options<OpaqueValue> opts) {
+    public static StateFactory opaque(CqlRowMapper mapper, Options<OpaqueValue> opts) {
         return new CassandraCqlMapStateFactory(mapper, StateType.OPAQUE, opts);
     }
 
     @SuppressWarnings("rawtypes")
-    public static StateFactory transactional(CqlTupleMapper mapper) {
+    public static StateFactory transactional(CqlRowMapper mapper) {
         Options<TransactionalValue> options = new Options<TransactionalValue>();
         return transactional(mapper, options);
     }
 
     @SuppressWarnings("rawtypes")
-    public static StateFactory transactional(CqlTupleMapper mapper, Options<TransactionalValue> opts) {
+    public static StateFactory transactional(CqlRowMapper mapper, Options<TransactionalValue> opts) {
         return new CassandraCqlMapStateFactory(mapper, StateType.TRANSACTIONAL, opts);
     }
 
     @SuppressWarnings("rawtypes")
-    public static StateFactory nonTransactional(CqlTupleMapper mapper) {
+    public static StateFactory nonTransactional(CqlRowMapper mapper) {
         Options<Object> options = new Options<Object>();
         return nonTransactional(mapper, options);
     }
 
     @SuppressWarnings("rawtypes")
-    public static StateFactory nonTransactional(CqlTupleMapper mapper, Options<Object> opts) {
+    public static StateFactory nonTransactional(CqlRowMapper mapper, Options<Object> opts) {
         return new CassandraCqlMapStateFactory(mapper, StateType.NON_TRANSACTIONAL, opts);
     }
 
@@ -81,7 +104,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     private final Session session;
 
     @SuppressWarnings("rawtypes")
-    private CqlTupleMapper mapper;
+    private CqlRowMapper mapper;
 
     // Metrics for storm metrics registering
     CountMetric _mreads;
@@ -89,7 +112,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     CountMetric _mexceptions;
 
     @SuppressWarnings({"rawtypes"})
-    public CassandraCqlMapState(Session session, CqlTupleMapper mapper, Options<T> options, Map conf) {
+    public CassandraCqlMapState(Session session, CqlRowMapper mapper, Options<T> options, Map conf) {
         //this.options = options;
         this.session = session;
         this.mapper = mapper;

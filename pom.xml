@@ -36,7 +36,7 @@
     </repositories>
 
     <properties>
-        <storm.version>0.9.0-rc2</storm.version>
+        <storm.version>0.9.1-incubating</storm.version>
         <cassandra.version>1.2.5</cassandra.version>
     </properties>
 
@@ -58,8 +58,8 @@
             <version>1.6.4</version>
         </dependency>
         <dependency>
-            <groupId>storm</groupId>
-            <artifactId>storm</artifactId>
+            <groupId>org.apache.storm</groupId>
+            <artifactId>storm-core</artifactId>
             <version>${storm.version}</version>
             <!-- keep storm out of the jar-with-dependencies -->
             <scope>provided</scope>

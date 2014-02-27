@@ -5,6 +5,7 @@ import storm.trident.tuple.TridentTuple;
 
 
 public class IntegerCount implements CombinerAggregator<Integer> {
+    private static final long serialVersionUID = 1L;
 
     @Override
     public Integer init(TridentTuple tuple) {
