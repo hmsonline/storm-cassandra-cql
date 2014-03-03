@@ -1,8 +1,8 @@
-package com.hmsonline.trident.cql;
+package com.hmsonline.trident.cql.mappers;
 
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Statement;
 import storm.trident.tuple.TridentTuple;
+
+import com.datastax.driver.core.Statement;
 
 /**
  * The <code>CqlTupleMapper</code> interface is responsible
@@ -13,12 +13,10 @@ import storm.trident.tuple.TridentTuple;
  * @param V the value to map and retrieve
  * @author rlee
  */
-public interface CqlTupleMapper<K, V> {
+public abstract interface CqlTupleMapper<K, V> {
     public Statement map(K key, V value);
 
     public Statement map(TridentTuple tuple);
 
     public Statement retrieve(K key);
-
-    public V getValue(Row row);
 }

@@ -1,8 +1,11 @@
 package com.hmsonline.trident.cql;
 
 import com.datastax.driver.core.Statement;
+import com.hmsonline.trident.cql.mappers.CqlTupleMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import storm.trident.operation.TridentCollector;
 import storm.trident.operation.TridentOperationContext;
 import storm.trident.state.StateUpdater;

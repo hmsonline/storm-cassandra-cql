@@ -1,14 +1,17 @@
 package com.hmsonline.trident.cql;
 
-import com.datastax.driver.core.BatchStatement;
-import com.datastax.driver.core.BatchStatement.Type;
-import com.datastax.driver.core.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import storm.trident.state.State;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import storm.trident.state.State;
+
+import com.datastax.driver.core.BatchStatement;
+import com.datastax.driver.core.BatchStatement.Type;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Statement;
 
 public class CassandraCqlState implements State {
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlState.class);
@@ -34,5 +37,9 @@ public class CassandraCqlState implements State {
 
     public void addStatement(Statement statement) {
         this.statements.add(statement);
+    }
+    
+    public ResultSet execute(Statement statement){
+        return clientFactory.getSession().execute(statement);
     }
 }

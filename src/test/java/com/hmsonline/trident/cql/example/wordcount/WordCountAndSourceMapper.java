@@ -1,21 +1,20 @@
 package com.hmsonline.trident.cql.example.wordcount;
 
+import java.io.Serializable;
+import java.util.List;
+
+import storm.trident.tuple.TridentTuple;
+
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
-import com.hmsonline.trident.cql.CqlTupleMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import storm.trident.tuple.TridentTuple;
+import com.hmsonline.trident.cql.mappers.CqlRowMapper;
 
-import java.io.Serializable;
-import java.util.List;
-
-public class WordCountAndSourceMapper implements CqlTupleMapper<List<String>, Number>, Serializable {
+public class WordCountAndSourceMapper implements CqlRowMapper<List<String>, Number>, Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = LoggerFactory.getLogger(WordCountAndSourceMapper.class);
+    //private static final Logger LOG = LoggerFactory.getLogger(WordCountAndSourceMapper.class);
 
     public static final String KEYSPACE_NAME = "mykeyspace";
     public static final String TABLE_NAME = "wordcounttable";

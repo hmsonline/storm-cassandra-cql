@@ -1,14 +1,21 @@
 package com.hmsonline.trident.cql;
 
-import backtype.storm.task.IMetricsContext;
-import backtype.storm.tuple.Values;
-import com.hmsonline.trident.cql.CassandraCqlMapState.Options;
+import java.util.Map;
+
 import storm.trident.state.State;
 import storm.trident.state.StateFactory;
 import storm.trident.state.StateType;
-import storm.trident.state.map.*;
+import storm.trident.state.map.CachedMap;
+import storm.trident.state.map.MapState;
+import storm.trident.state.map.NonTransactionalMap;
+import storm.trident.state.map.OpaqueMap;
+import storm.trident.state.map.SnapshottableMap;
+import storm.trident.state.map.TransactionalMap;
+import backtype.storm.task.IMetricsContext;
+import backtype.storm.tuple.Values;
 
-import java.util.Map;
+import com.hmsonline.trident.cql.CassandraCqlMapState.Options;
+import com.hmsonline.trident.cql.mappers.CqlRowMapper;
 
 /**
  * The class responsible for generating instances of
@@ -24,10 +31,10 @@ public class CassandraCqlMapStateFactory implements StateFactory {
     private Options<?> options;
 
     @SuppressWarnings("rawtypes")
-    private CqlTupleMapper mapper;
+    private CqlRowMapper mapper;
 
     @SuppressWarnings({"rawtypes"})
-    public CassandraCqlMapStateFactory(CqlTupleMapper mapper, StateType stateType, Options options) {
+    public CassandraCqlMapStateFactory(CqlRowMapper mapper, StateType stateType, Options options) {
         this.stateType = stateType;
         this.options = options;
         this.mapper = mapper;
