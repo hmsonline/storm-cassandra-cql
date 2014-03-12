@@ -6,6 +6,7 @@ import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
 import com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import storm.trident.operation.builtin.Sum;
@@ -23,6 +24,7 @@ import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper
 /**
  * Test that demonstrates how to construct and use conditional updates.
  */
+@Ignore
 @RunWith(JUnit4.class)
 public class IncrementalStateTest extends ConditionalUpdateTest {
     private CassandraCqlIncrementalStateFactory<String, Number> stateFactory;
