@@ -6,6 +6,7 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.core.querybuilder.Update;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test that demonstrates how to construct and use conditional updates.
  */
+@Ignore
 @RunWith(JUnit4.class)
 public class ConditionalUpdateTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConditionalUpdateTest.class);
