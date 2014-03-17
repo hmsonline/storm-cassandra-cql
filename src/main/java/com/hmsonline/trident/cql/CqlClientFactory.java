@@ -24,7 +24,7 @@ public class CqlClientFactory implements Serializable {
     @SuppressWarnings("rawtypes")
     public CqlClientFactory(Map configuration) {
         String hostProperty = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-        String[] hosts = hostProperty.split(";");
+        String[] hosts = hostProperty.split(",");
         try {
             if (LOG.isDebugEnabled()) {
                 for (String host : hosts) {
