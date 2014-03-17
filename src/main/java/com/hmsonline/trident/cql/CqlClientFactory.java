@@ -54,7 +54,8 @@ public class CqlClientFactory implements Serializable {
                 }
                 cluster = Cluster.builder().addContactPoints(hosts).build();
                 if (cluster == null) {
-                    throw new RuntimeException("Could not connect to Cassandra cluster with hosts " + hosts);
+                    throw new RuntimeException("Critical error: cluster is null after "
+                            + "attempting to build with contact points (hosts) " + hosts);
                 }
             } catch (NoHostAvailableException e) {
                 throw new RuntimeException(e);
