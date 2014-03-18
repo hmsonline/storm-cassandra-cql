@@ -25,7 +25,7 @@ public class CqlClientFactory implements Serializable {
     @SuppressWarnings("rawtypes")
     public CqlClientFactory(Map configuration) {
         String hostProperty = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-        hosts = hostProperty.split(";");
+        hosts = hostProperty.split(",");
     }
 
     public synchronized Session getSession(String keyspace) {
