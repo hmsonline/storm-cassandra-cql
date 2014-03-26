@@ -57,4 +57,14 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     public Number getValue(TridentTuple tuple) {
         return tuple.getInteger(0);
     }
+
+    @Override
+    public Statement condition(String key, long txid, int partitionIndex) {
+        return null;
+    }
+
+    @Override
+    public Statement updateCondition(String key, long txid, int partitionIndex) {
+        return null;
+    }
 }

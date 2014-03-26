@@ -21,11 +21,13 @@ public class CassandraCqlIncrementalState<K, V> implements State {
     private CqlIncrementMapper<K, V> mapper;
     private Map<K, V> aggregateValues;
     public static int MAX_ATTEMPTS = 10;
+    private int partitionIndex;
 
-    public CassandraCqlIncrementalState(CqlClientFactory clientFactory, CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper) {
+    public CassandraCqlIncrementalState(CqlClientFactory clientFactory, CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper, int partitionIndex) {
         this.clientFactory = clientFactory;
         this.aggregator = aggregator;
         this.mapper = mapper;
+        this.partitionIndex = partitionIndex;
     }
 
     @Override
@@ -50,6 +52,27 @@ public class CassandraCqlIncrementalState<K, V> implements State {
     public void commit(Long txid) {
         // Read current value.
         for (Map.Entry<K, V> entry : aggregateValues.entrySet()) {
+
+            //Try to check pre-condition first; this is optional
+            final Statement condition = mapper.condition(entry.getKey(), txid, partitionIndex);
+            if (condition != null) {
+                ResultSet results = clientFactory.getSession().execute(condition);
+                if (results != null) {
+
+                    final List<Row> rows = results.all();
+
+                    if (rows.size() > 0) {
+                        continue; //condition is not satisfied => skip
+                    } else {
+                        //condition is satisfied => persist it
+                        final Statement updateCondition = mapper.updateCondition(entry.getKey(), txid, partitionIndex);
+                        if (updateCondition != null) {
+                            applyUpdate(updateCondition);
+                        }
+                    }
+                }
+            }
+
             Statement readStatement = mapper.read(entry.getKey());
             LOG.debug("EXECUTING [{}]", readStatement.toString());
 

@@ -32,6 +32,6 @@ public class CassandraCqlIncrementalStateFactory<K, V> implements StateFactory {
             clientFactory = new CqlClientFactory(configuration);
         }
         LOG.debug("Creating State for partition [{}] of [{}]", new Object[]{partitionIndex, numPartitions});
-        return new CassandraCqlIncrementalState<K, V>(CassandraCqlIncrementalStateFactory.clientFactory, aggregator, mapper);
+        return new CassandraCqlIncrementalState<K, V>(CassandraCqlIncrementalStateFactory.clientFactory, aggregator, mapper, partitionIndex);
     }
 }
