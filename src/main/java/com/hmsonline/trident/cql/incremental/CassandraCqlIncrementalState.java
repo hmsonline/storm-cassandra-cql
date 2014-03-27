@@ -59,7 +59,9 @@ public class CassandraCqlIncrementalState<K, V> implements State {
             //key and insert if not exist. Following code checks the execution of condition statement
             //and skip the loop when receiving false value => Insert is failed, key is existed.
             final Statement condition = mapper.condition(entry.getKey(), txid, partitionIndex);
-            if (condition != null && !applyUpdate(condition)) {
+            final boolean notSatisfiedPrecondition = condition != null && !applyUpdate(condition);
+
+            if (notSatisfiedPrecondition) {
                 continue;
             }
 
