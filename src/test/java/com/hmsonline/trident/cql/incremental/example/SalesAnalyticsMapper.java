@@ -59,12 +59,7 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     }
 
     @Override
-    public Statement condition(String key, long txid, int partitionIndex) {
-        return null;
-    }
-
-    @Override
-    public Statement updateCondition(String key, long txid, int partitionIndex) {
+    public Statement condition(String key, Long txid, int partitionIndex) {
         return null;
     }
 }

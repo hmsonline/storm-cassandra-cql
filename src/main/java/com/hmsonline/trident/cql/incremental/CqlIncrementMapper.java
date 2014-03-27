@@ -16,7 +16,5 @@ public interface CqlIncrementMapper<K, V> {
 
     public V getValue(TridentTuple tuple);
 
-    Statement condition(K key, long txid, int partitionIndex);
-
-    Statement updateCondition(K key, long txid, int partitionIndex);
+    Statement condition(K key, Long txid, int partitionIndex);
 }
