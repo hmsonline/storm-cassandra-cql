@@ -35,7 +35,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         aggregateValues = new HashMap<K, V>();
     }
 
-    private void applyUpdate(Statement updateStatement) {
+    private boolean applyUpdate(Statement updateStatement) {
         LOG.debug("APPLYING [{}]", updateStatement.toString());
         boolean applied = false;
         int attempts = 0;
@@ -46,6 +46,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
                 applied = row.getBool("[applied]");
             attempts++;
         }
+        return applied;
     }
 
     @Override
@@ -55,22 +56,8 @@ public class CassandraCqlIncrementalState<K, V> implements State {
 
             //Try to check pre-condition first; this is optional
             final Statement condition = mapper.condition(entry.getKey(), txid, partitionIndex);
-            if (condition != null) {
-                ResultSet results = clientFactory.getSession().execute(condition);
-                if (results != null) {
-
-                    final List<Row> rows = results.all();
-
-                    if (rows.size() > 0) {
-                        continue; //condition is not satisfied => skip
-                    } else {
-                        //condition is satisfied => persist it
-                        final Statement updateCondition = mapper.updateCondition(entry.getKey(), txid, partitionIndex);
-                        if (updateCondition != null) {
-                            applyUpdate(updateCondition);
-                        }
-                    }
-                }
+            if (condition != null && !applyUpdate(condition)) {
+                continue;
             }
 
             Statement readStatement = mapper.read(entry.getKey());
