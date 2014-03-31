@@ -54,17 +54,6 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         // Read current value.
         for (Map.Entry<K, V> entry : aggregateValues.entrySet()) {
 
-            //Try to check pre-condition first; this is optional
-            //The logic of condition is simple. The return statement checks a table for existing
-            //key and insert if not exist. Following code checks the execution of condition statement
-            //and skip the loop when receiving false value => Insert is failed, key is existed.
-            final Statement condition = mapper.condition(entry.getKey(), txid, partitionIndex);
-            final boolean notSatisfiedPrecondition = condition != null && !applyUpdate(condition);
-
-            if (notSatisfiedPrecondition) {
-                continue;
-            }
-
             Statement readStatement = mapper.read(entry.getKey());
             LOG.debug("EXECUTING [{}]", readStatement.toString());
 
@@ -89,7 +78,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
                 else
                     combinedValue = entry.getValue();
 
-                Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue);
+                Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue, txid, partitionIndex);
                 applyUpdate(updateStatement);
             }
 
