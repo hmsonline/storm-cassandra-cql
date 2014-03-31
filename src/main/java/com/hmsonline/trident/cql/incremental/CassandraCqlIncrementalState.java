@@ -21,11 +21,13 @@ public class CassandraCqlIncrementalState<K, V> implements State {
     private CqlIncrementMapper<K, V> mapper;
     private Map<K, V> aggregateValues;
     public static int MAX_ATTEMPTS = 10;
+    private int partitionIndex;
 
-    public CassandraCqlIncrementalState(CqlClientFactory clientFactory, CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper) {
+    public CassandraCqlIncrementalState(CqlClientFactory clientFactory, CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper, int partitionIndex) {
         this.clientFactory = clientFactory;
         this.aggregator = aggregator;
         this.mapper = mapper;
+        this.partitionIndex = partitionIndex;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         aggregateValues = new HashMap<K, V>();
     }
 
-    private void applyUpdate(Statement updateStatement) {
+    private boolean applyUpdate(Statement updateStatement) {
         LOG.debug("APPLYING [{}]", updateStatement.toString());
         boolean applied = false;
         int attempts = 0;
@@ -44,12 +46,14 @@ public class CassandraCqlIncrementalState<K, V> implements State {
                 applied = row.getBool("[applied]");
             attempts++;
         }
+        return applied;
     }
 
     @Override
     public void commit(Long txid) {
         // Read current value.
         for (Map.Entry<K, V> entry : aggregateValues.entrySet()) {
+
             Statement readStatement = mapper.read(entry.getKey());
             LOG.debug("EXECUTING [{}]", readStatement.toString());
 
@@ -74,7 +78,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
                 else
                     combinedValue = entry.getValue();
 
-                Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue);
+                Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue, txid, partitionIndex);
                 applyUpdate(updateStatement);
             }
 

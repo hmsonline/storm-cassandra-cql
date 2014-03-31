@@ -33,7 +33,7 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     }
 
     @Override
-    public Statement update(String key, Number value, Number oldValue) {
+    public Statement update(String key, Number value, Number oldValue, long txid, int partition) {
         Update update = QueryBuilder.update(KEYSPACE_NAME, TABLE_NAME);
         update.with(set(VALUE_NAME, value)).where(eq(KEY_NAME, key));
         if (oldValue != null) {
@@ -57,4 +57,5 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     public Number getValue(TridentTuple tuple) {
         return tuple.getInteger(0);
     }
+
 }

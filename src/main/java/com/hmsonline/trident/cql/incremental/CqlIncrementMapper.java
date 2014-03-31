@@ -8,12 +8,11 @@ public interface CqlIncrementMapper<K, V> {
 
     public Statement read(K key);
 
-    public Statement update(K key, V value, V oldValue);
+    public Statement update(K key, V value, V oldValue, long txid, int partitionIndex);
 
     public V currentValue(Row row);
 
     public K getKey(TridentTuple tuple);
 
     public V getValue(TridentTuple tuple);
-
 }
