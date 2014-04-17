@@ -14,7 +14,7 @@ import storm.trident.tuple.TridentTuple;
 import java.util.List;
 import java.util.Map;
 
-public class CassandraCqlStateUpdater implements StateUpdater<CassandraCqlState> {
+public class CassandraCqlStateUpdater<K,V> implements StateUpdater<CassandraCqlState> {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlStateUpdater.class);
     private CqlTupleMapper mapper = null;

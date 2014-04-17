@@ -17,7 +17,8 @@ import com.hmsonline.trident.cql.incremental.CqlIncrementMapper;
 
 public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>, Serializable {
     private static final long serialVersionUID = 1L;
-    //private static final Logger LOG = LoggerFactory.getLogger(SalesAnalyticsMapper.class);
+    // private static final Logger LOG =
+    // LoggerFactory.getLogger(SalesAnalyticsMapper.class);
 
     // values assumed by the schema.cql; should make customizable by constructor
     public static final String KEYSPACE_NAME = "mykeyspace";
@@ -33,7 +34,7 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     }
 
     @Override
-    public Statement update(String key, Number value, Number oldValue, long txid, int partition) {
+    public Statement update(String key, Number value, Number oldValue, Row row, long txid, int partition) {
         Update update = QueryBuilder.update(KEYSPACE_NAME, TABLE_NAME);
         update.with(set(VALUE_NAME, value)).where(eq(KEY_NAME, key));
         if (oldValue != null) {
@@ -43,7 +44,7 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     }
 
     @Override
-    public Number currentValue(Row row) {
+    public Number currentValue(String key, Row row) {
         return row.getInt(VALUE_NAME);
     }
 

@@ -63,10 +63,12 @@ public class CassandraCqlIncrementalState<K, V> implements State {
 
             if (results != null) {
                 List<Row> rows = results.all();
+                Row readRow = null;
                 if (rows.size() > 1) {
                     LOG.error("Found non-unique value for key [{}]", entry.getKey());
                 } else if (rows.size() == 1) {
-                    persistedValue = mapper.currentValue(rows.get(0));
+                    readRow = rows.get(0);
+                    persistedValue = mapper.currentValue(entry.getKey(), readRow);
                     LOG.debug("Persisted value = [{}]", persistedValue);
                 }
 
@@ -78,7 +80,8 @@ public class CassandraCqlIncrementalState<K, V> implements State {
                 else
                     combinedValue = entry.getValue();
 
-                Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue, txid, partitionIndex);
+                
+                Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue, readRow, txid, partitionIndex);
                 applyUpdate(updateStatement);
             }
 
