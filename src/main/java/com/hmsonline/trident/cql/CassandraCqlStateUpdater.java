@@ -17,9 +17,9 @@ import java.util.Map;
 public class CassandraCqlStateUpdater<K,V> implements StateUpdater<CassandraCqlState> {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlStateUpdater.class);
-    private CqlTupleMapper mapper = null;
+    private CqlTupleMapper<K,V> mapper = null;
 
-    public CassandraCqlStateUpdater(CqlTupleMapper mapper) {
+    public CassandraCqlStateUpdater(CqlTupleMapper<K,V> mapper) {
         this.mapper = mapper;
     }
 

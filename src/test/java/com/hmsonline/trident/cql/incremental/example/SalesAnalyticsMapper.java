@@ -5,6 +5,7 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.set;
 
 import java.io.Serializable;
+import java.util.List;
 
 import storm.trident.tuple.TridentTuple;
 
@@ -14,6 +15,7 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.querybuilder.Select;
 import com.datastax.driver.core.querybuilder.Update;
 import com.hmsonline.trident.cql.incremental.CqlIncrementMapper;
+import com.hmsonline.trident.cql.incremental.PersistedState;
 
 public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>, Serializable {
     private static final long serialVersionUID = 1L;
@@ -34,18 +36,18 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
     }
 
     @Override
-    public Statement update(String key, Number value, Number oldValue, Row row, long txid, int partition) {
+    public Statement update(String key, Number value, PersistedState<Number> state, long txid, int partition) {
         Update update = QueryBuilder.update(KEYSPACE_NAME, TABLE_NAME);
         update.with(set(VALUE_NAME, value)).where(eq(KEY_NAME, key));
-        if (oldValue != null) {
-            update.onlyIf(eq(VALUE_NAME, oldValue));
+        if (state.getValue() != null) {
+            update.onlyIf(eq(VALUE_NAME, state.getValue()));
         }
         return update;
     }
 
     @Override
-    public Number currentValue(String key, Row row) {
-        return row.getInt(VALUE_NAME);
+    public SalesState currentState(String key, List<Row> rows) {
+        return new SalesState(rows.get(0).getInt(VALUE_NAME));
     }
 
     @Override
