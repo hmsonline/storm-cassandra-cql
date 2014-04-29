@@ -23,7 +23,8 @@ public class CassandraCqlIncrementalState<K, V> implements State {
     public static int MAX_ATTEMPTS = 10;
     private int partitionIndex;
 
-    public CassandraCqlIncrementalState(CqlClientFactory clientFactory, CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper, int partitionIndex) {
+    public CassandraCqlIncrementalState(CqlClientFactory clientFactory, CombinerAggregator<V> aggregator,
+            CqlIncrementMapper<K, V> mapper, int partitionIndex) {
         this.clientFactory = clientFactory;
         this.aggregator = aggregator;
         this.mapper = mapper;
@@ -59,26 +60,19 @@ public class CassandraCqlIncrementalState<K, V> implements State {
 
             ResultSet results = clientFactory.getSession().execute(readStatement);
 
-            V persistedValue = null;
-
             if (results != null) {
                 List<Row> rows = results.all();
-                if (rows.size() > 1) {
-                    LOG.error("Found non-unique value for key [{}]", entry.getKey());
-                } else if (rows.size() == 1) {
-                    persistedValue = mapper.currentValue(rows.get(0));
-                    LOG.debug("Persisted value = [{}]", persistedValue);
-                }
+                PersistedState<V> persistedState = mapper.currentState(entry.getKey(), rows);
+                LOG.debug("Persisted value = [{}]", persistedState.getValue());
 
                 V combinedValue;
-                // TODO: more elegant solution to this issue
-                // Must be careful here as the first persisted value might not exist yet!
-                if (persistedValue != null)
-                    combinedValue = aggregator.combine(entry.getValue(), persistedValue);
+                if (persistedState.getValue() != null)
+                    combinedValue = aggregator.combine(entry.getValue(), persistedState.getValue());
                 else
                     combinedValue = entry.getValue();
 
-                Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedValue, txid, partitionIndex);
+                Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedState, txid,
+                        partitionIndex);
                 applyUpdate(updateStatement);
             }
 
@@ -96,7 +90,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         } else {
             newValue = aggregator.combine(currentValue, value);
         }
-        LOG.debug("Updating state [{}] ==> [{}]", new Object[]{key, newValue});
+        LOG.debug("Updating state [{}] ==> [{}]", new Object[] { key, newValue });
         aggregateValues.put(key, newValue);
     }
 
