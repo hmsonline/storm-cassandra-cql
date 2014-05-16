@@ -47,7 +47,7 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
 
     @Override
     public SalesState currentState(String key, List<Row> rows) {
-        return new SalesState(rows.get(0).getInt(VALUE_NAME));
+        return new SalesState(rows.get(0).getInt(VALUE_NAME),rows.get(0).getString("partitions"));
     }
 
     @Override

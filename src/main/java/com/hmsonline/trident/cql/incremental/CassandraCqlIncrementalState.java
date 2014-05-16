@@ -73,6 +73,10 @@ public class CassandraCqlIncrementalState<K, V> implements State {
 
                     Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedState, txid,
                             partitionIndex);
+                    //mapper don't want to update
+                    if(updateStatement==null){
+                        return;
+                    }
                     applied = applyUpdate(updateStatement);
                 }
             }
