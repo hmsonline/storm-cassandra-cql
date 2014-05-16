@@ -15,12 +15,19 @@ import com.datastax.driver.core.Statement;
 
 public class CassandraCqlState implements State {
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlState.class);
-
+    private static final int DEFAULT_MAX_BATCH_SIZE = 100;
     private CqlClientFactory clientFactory;
+    private int maxBatchSize;
     List<Statement> statements = new ArrayList<Statement>();
 
     public CassandraCqlState(CqlClientFactory clientFactory) {
         this.clientFactory = clientFactory;
+        this.maxBatchSize = DEFAULT_MAX_BATCH_SIZE;
+    }
+    
+    public CassandraCqlState(CqlClientFactory clientFactory, int maxBatchSize) {
+        this.clientFactory = clientFactory;
+        this.maxBatchSize = maxBatchSize;
     }
 
     @Override
@@ -31,8 +38,19 @@ public class CassandraCqlState implements State {
     public void commit(Long txid) {
         LOG.debug("Commiting [{}]", txid);
         BatchStatement batch = new BatchStatement(Type.LOGGED);
-        batch.addAll(this.statements);
-        clientFactory.getSession().execute(batch);
+        int i = 0;
+        for(Statement statement : this.statements) {
+            batch.add(statement);
+            i++;
+            if(i >= this.maxBatchSize) {
+                clientFactory.getSession().execute(batch);
+                batch = new BatchStatement(Type.LOGGED);
+                i = 0;
+            }
+        }
+        if(i > 0) {
+            clientFactory.getSession().execute(batch);
+        }
     }
 
     public void addStatement(Statement statement) {
