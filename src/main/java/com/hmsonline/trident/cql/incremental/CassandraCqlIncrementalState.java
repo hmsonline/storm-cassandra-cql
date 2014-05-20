@@ -65,65 +65,56 @@ public class CassandraCqlIncrementalState<K, V> implements State {
     @Override
     public void commit(Long txid) {
         boolean applied = false;
-        int attempts = 0;
         DriverException lastException = null;
         // Read current value.
         //if we failed to apply the update , maybe the state has change already , we need to calculate the new state and apply it again
-        
-        while (!applied && attempts < maxAttempts) {
-            try{
-                updateState(txid);
-            } catch(QueryExecutionException e) {
-                lastException = e;
-                LOG.warn("Catching {} attempt {}"+txid+"-"+partitionIndex, e.getMessage(), attempts);
-                continue;
+        for (Map.Entry<K, V> entry : aggregateValues.entrySet()) {
+            int attempts = 0;
+            while (!applied && attempts < maxAttempts) {
+                try{
+                    applied = updateState(entry, txid);
+                } catch(QueryExecutionException e) {
+                    lastException = e;
+                    LOG.warn("Catching {} attempt {}"+txid+"-"+partitionIndex, e.getMessage(), attempts);
+                }
+                attempts++;
             }
-            attempts++;
-        }
-        if(attempts >= maxAttempts && !applied) {
-            if(lastException != null) {
-                throw new CassandraCqlIncrementalStateException("Ran out of attempts ["+attempts+"] max of ["+maxAttempts+"] "+txid+"-"+ partitionIndex, lastException);
-            } else {
-                throw new CassandraCqlIncrementalStateException("Ran out of attempts ["+attempts+"] max of ["+maxAttempts+"] "+txid+"-"+ partitionIndex);
+            if(!applied) {
+                if(lastException != null) {
+                    throw new CassandraCqlIncrementalStateException("Ran out of attempts ["+attempts+"] max of ["+maxAttempts+"] "+txid+"-"+ partitionIndex, lastException);
+                } else {
+                    throw new CassandraCqlIncrementalStateException("Ran out of attempts ["+attempts+"] max of ["+maxAttempts+"] "+txid+"-"+ partitionIndex);
+                }
             }
         }
     }
-    
-    private boolean updateState(Long txid) {
-        boolean allApplied = true;
-        boolean applied = false;
-        for (Map.Entry<K, V> entry : aggregateValues.entrySet()) {
-           
-                Statement readStatement = mapper.read(entry.getKey());
-                LOG.debug("EXECUTING [{}]", readStatement.toString());
+        
+    private boolean updateState(Map.Entry<K, V> entry, Long txid) {
+        Statement readStatement = mapper.read(entry.getKey());
+        LOG.debug("EXECUTING [{}]", readStatement.toString());
 
-                if(aggregateValues.keySet().size() > 1) {
-                    LOG.debug("WARNING size is could make this fail [{}]", aggregateValues.keySet().size());
-                }
-                ResultSet results = clientFactory.getSession().execute(readStatement);
-
-                if (results != null) {
-                    List<Row> rows = results.all();
-                    PersistedState<V> persistedState = mapper.currentState(entry.getKey(), rows);
-                    LOG.debug("Persisted value = [{}]", persistedState.getValue());
-
-                    V combinedValue;
-                    if (persistedState.getValue() != null)
-                        combinedValue = aggregator.combine(entry.getValue(), persistedState.getValue());
-                    else
-                        combinedValue = entry.getValue();
-
-                    Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedState, txid,
-                            partitionIndex);
-                    //mapper don't want to update
-                    if(updateStatement==null){
-                        continue;
-                    }
-                    applied = applyUpdate(updateStatement, txid);
-                }
-                allApplied = allApplied & applied;
+        if(aggregateValues.keySet().size() > 1) {
+            LOG.debug("WARNING size is could make this fail [{}]", aggregateValues.keySet().size());
         }
-        return allApplied;
+        ResultSet results = clientFactory.getSession().execute(readStatement);
+
+        List<Row> rows = results.all();
+        PersistedState<V> persistedState = mapper.currentState(entry.getKey(), rows);
+        LOG.debug("Persisted value = [{}]", persistedState.getValue());
+
+        V combinedValue;
+        if (persistedState.getValue() != null)
+            combinedValue = aggregator.combine(entry.getValue(), persistedState.getValue());
+        else
+            combinedValue = entry.getValue();
+
+        Statement updateStatement = mapper.update(entry.getKey(), combinedValue, persistedState, txid,
+                partitionIndex);
+        //mapper don't want to update
+        if(updateStatement==null){
+            return true;
+        }
+        return applyUpdate(updateStatement, txid);
     }
 
     // TODO: Do we need to synchronize this? (or use Concurrent)
