@@ -58,8 +58,9 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         Row row = results.one();
         if (row != null) {
             return row.getBool("[applied]");
+        } else {
+            return true;
         }
-        return false;
     }
 
     @Override
