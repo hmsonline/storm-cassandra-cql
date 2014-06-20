@@ -168,7 +168,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
             }
 
             // Execute all the statements as a batch.
-            BatchStatement batch = new BatchStatement(Type.LOGGED);
+            BatchStatement batch = new BatchStatement(Type.COUNTER);
             batch.addAll(statements);
             session.execute(batch);
 
