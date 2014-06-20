@@ -5,3 +5,7 @@
 *.war
 *.ear
 /target
+
+# IDE Files #
+*.iml
+.idea
