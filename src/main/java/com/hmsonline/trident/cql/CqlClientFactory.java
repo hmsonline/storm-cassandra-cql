@@ -1,13 +1,18 @@
 package com.hmsonline.trident.cql;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ProtocolOptions;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 
@@ -47,12 +52,18 @@ public class CqlClientFactory implements Serializable {
     public Cluster getCluster() {
         if (cluster == null) {
             try {
-                if (LOG.isDebugEnabled()) {
-                    for (String host : hosts) {
-                        LOG.debug("Connecting to [" + host + "]");
+                List<InetSocketAddress> sockets = new ArrayList<InetSocketAddress>();
+                for (String host : hosts) {
+                    if(StringUtils.contains(host, ":")) {
+                        String hostParts [] = StringUtils.split(host, ":");
+                        sockets.add(new InetSocketAddress(hostParts[0], Integer.valueOf(hostParts[1])));
+                        LOG.debug("Connecting to [" + host + "] with port [" + hostParts[1] + "]");
+                    } else {
+                        sockets.add(new InetSocketAddress(host, ProtocolOptions.DEFAULT_PORT));
+                        LOG.debug("Connecting to [" + host + "] with port [" + ProtocolOptions.DEFAULT_PORT + "]");
                     }
                 }
-                cluster = Cluster.builder().addContactPoints(hosts).build();
+                cluster = Cluster.builder().addContactPointsWithPorts(sockets).build();
                 if (cluster == null) {
                     throw new RuntimeException("Critical error: cluster is null after "
                             + "attempting to build with contact points (hosts) " + hosts);
