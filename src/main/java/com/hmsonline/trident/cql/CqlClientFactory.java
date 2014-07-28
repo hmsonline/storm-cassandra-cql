@@ -64,7 +64,7 @@ public class CqlClientFactory implements Serializable {
                     if(ports.length == 1) {
                         port = Integer.valueOf(ports[0]);
                     } else {
-                        port = Integer.valueOf(ports[0]);
+                        port = Integer.valueOf(ports[i]);
                     }
                     sockets.add(new InetSocketAddress(host, port));
                     LOG.debug("Connecting to [" + host + "] with port [" + port + "]");
