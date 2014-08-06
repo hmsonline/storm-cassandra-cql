@@ -164,7 +164,13 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
             for (int i = 0; i < keys.size(); i++) {
                 List<Object> key = keys.get(i);
                 T val = values.get(i);
-                statements.add(mapper.map(key, val));
+                Statement retrievedStatment = mapper.map(key, val);
+                if (retrievedStatment instanceof BatchStatement) { // Allows for BatchStatements to be returned by the mapper.
+					BatchStatement batchedStatment = (BatchStatement) retrievedStatment;
+					statements.addAll(batchedStatment.getStatements());
+				} else {
+					statements.add(retrievedStatment);
+				}
             }
 
             // Execute all the statements as a batch.
