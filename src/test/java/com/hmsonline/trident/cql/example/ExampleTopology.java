@@ -1,15 +1,18 @@
 package com.hmsonline.trident.cql.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import storm.trident.Stream;
+import storm.trident.TridentTopology;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.tuple.Fields;
+
+import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlStateFactory;
 import com.hmsonline.trident.cql.CassandraCqlStateUpdater;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import storm.trident.Stream;
-import storm.trident.TridentTopology;
 
 public class ExampleTopology {
     private static final Logger LOG = LoggerFactory.getLogger(ExampleTopology.class);
@@ -20,7 +23,7 @@ public class ExampleTopology {
         ExampleSpout spout = new ExampleSpout();
         Stream inputStream = topology.newStream("test", spout);
         ExampleMapper mapper = new ExampleMapper();
-        inputStream.partitionPersist(new CassandraCqlStateFactory(), new Fields("test"), new CassandraCqlStateUpdater(mapper));
+        inputStream.partitionPersist(new CassandraCqlStateFactory(ConsistencyLevel.ONE), new Fields("test"), new CassandraCqlStateUpdater(mapper));
         return topology.build();
     }
 
