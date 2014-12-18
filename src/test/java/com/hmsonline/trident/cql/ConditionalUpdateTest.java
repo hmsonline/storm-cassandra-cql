@@ -1,23 +1,31 @@
 package com.hmsonline.trident.cql;
 
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Statement;
-import com.datastax.driver.core.querybuilder.Select;
-import com.datastax.driver.core.querybuilder.Update;
-import org.junit.Test;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.set;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.update;
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEYSPACE_NAME;
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEY_NAME;
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.TABLE_NAME;
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.VALUE_NAME;
+import static org.junit.Assert.assertEquals;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.*;
-import static org.junit.Assert.assertEquals;
+import com.datastax.driver.core.ConsistencyLevel;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Statement;
+import com.datastax.driver.core.querybuilder.Select;
+import com.datastax.driver.core.querybuilder.Update;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.
@@ -31,9 +39,7 @@ public class ConditionalUpdateTest {
     public String APPLIED_COLUMN = "[applied]";
 
     public ConditionalUpdateTest() {
-        configuration = new HashMap<String, String>();
-        configuration.put(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
-        clientFactory = new CqlClientFactory(configuration);
+        clientFactory = new CqlClientFactory("localhost", ConsistencyLevel.LOCAL_QUORUM);
     }
 
     public void assertValue(String k, Integer expectedValue) {
