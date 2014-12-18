@@ -34,11 +34,11 @@ public class CqlClientFactory implements Serializable {
     protected static Cluster cluster;
 
     public CqlClientFactory(String hosts) {
-        this(hosts, null, ConsistencyLevel.ONE, ConsistencyLevel.ONE);
+        this(hosts, null, ConsistencyLevel.QUORUM, ConsistencyLevel.QUORUM);
     }
 
     public CqlClientFactory(String hosts, ConsistencyLevel clusterConsistency) {
-        this(hosts, null, clusterConsistency, null);
+        this(hosts, null, clusterConsistency, ConsistencyLevel.QUORUM);
     }
     
     public CqlClientFactory(String hosts, String clusterName, ConsistencyLevel clusterConsistency, 
