@@ -39,7 +39,7 @@ public class ConditionalUpdateTest {
     public String APPLIED_COLUMN = "[applied]";
 
     public ConditionalUpdateTest() {
-        clientFactory = new CqlClientFactory("localhost", ConsistencyLevel.LOCAL_QUORUM);
+        clientFactory = new CqlClientFactory("localhost", ConsistencyLevel.QUORUM);
     }
 
     public void assertValue(String k, Integer expectedValue) {

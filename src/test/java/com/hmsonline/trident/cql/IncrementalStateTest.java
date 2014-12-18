@@ -1,25 +1,30 @@
 package com.hmsonline.trident.cql;
 
-import com.datastax.driver.core.querybuilder.Delete;
-import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalState;
-import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
-import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
-import com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper;
-import org.junit.Test;
-import org.junit.Ignore;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import storm.trident.operation.builtin.Sum;
-import storm.trident.testing.MockTridentTuple;
-import storm.trident.tuple.TridentTuple;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEYSPACE_NAME;
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEY_NAME;
+import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.TABLE_NAME;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
-import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.*;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+import storm.trident.operation.builtin.Sum;
+import storm.trident.testing.MockTridentTuple;
+import storm.trident.tuple.TridentTuple;
+
+import com.datastax.driver.core.ConsistencyLevel;
+import com.datastax.driver.core.querybuilder.Delete;
+import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalState;
+import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
+import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
+import com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.
@@ -33,7 +38,7 @@ public class IncrementalStateTest extends ConditionalUpdateTest {
 
     public IncrementalStateTest() {
         SalesAnalyticsMapper mapper = new SalesAnalyticsMapper();
-        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper);
+        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper, ConsistencyLevel.QUORUM);
         stateUpdater = new CassandraCqlIncrementalStateUpdater<String, Number>();
     }
 
@@ -49,15 +54,16 @@ public class IncrementalStateTest extends ConditionalUpdateTest {
         clearState();
 
         // Let's get some initial state in the database
-        CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>)
-                stateFactory.makeState(configuration, null, 5, 50);
+        CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(
+                configuration, null, 5, 50);
         this.incrementState(state);
         state.commit(Long.MAX_VALUE);
         this.assertValue("MD", 100);
 
-        // Let's create two state objects, to simulate multi-threaded/distributed operations.
-        CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>)
-                stateFactory.makeState(configuration, null, 55, 122);
+        // Let's create two state objects, to simulate
+        // multi-threaded/distributed operations.
+        CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(
+                configuration, null, 55, 122);
         this.incrementState(state1);
         state.commit(Long.MAX_VALUE);
         this.assertValue("MD", 200);

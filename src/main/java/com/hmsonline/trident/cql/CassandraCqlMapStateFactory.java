@@ -30,15 +30,18 @@ public class CassandraCqlMapStateFactory implements StateFactory {
     private CqlClientFactory clientFactory;
     private StateType stateType;
     private Options<?> options;
+    private ConsistencyLevel batchConsistencyLevel;
 
     @SuppressWarnings("rawtypes")
     private CqlRowMapper mapper;
 
     @SuppressWarnings({"rawtypes"})
-    public CassandraCqlMapStateFactory(CqlRowMapper mapper, StateType stateType, Options options) {
+    public CassandraCqlMapStateFactory(CqlRowMapper mapper, StateType stateType, Options options, 
+            ConsistencyLevel batchConsistencyLevel) {
         this.stateType = stateType;
         this.options = options;
         this.mapper = mapper;
+        this.batchConsistencyLevel = batchConsistencyLevel;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -46,7 +49,7 @@ public class CassandraCqlMapStateFactory implements StateFactory {
 
         if (clientFactory == null) {
             String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-            clientFactory = new CqlClientFactory(hosts, ConsistencyLevel.LOCAL_QUORUM);
+            clientFactory = new CqlClientFactory(hosts, batchConsistencyLevel);
         }
 
         CassandraCqlMapState state = new CassandraCqlMapState(clientFactory.getSession(options.keyspace), mapper, options, configuration);

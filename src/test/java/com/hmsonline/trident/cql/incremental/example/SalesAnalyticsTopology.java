@@ -4,11 +4,15 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.tuple.Fields;
+
+import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlStateFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import storm.trident.Stream;
 import storm.trident.TridentTopology;
 import storm.trident.operation.builtin.Sum;
@@ -23,7 +27,7 @@ public class SalesAnalyticsTopology {
         Stream inputStream = topology.newStream("sales", spout);
         SalesAnalyticsMapper mapper = new SalesAnalyticsMapper();
         inputStream.partitionPersist(
-                new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper),
+                new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper, ConsistencyLevel.QUORUM),
                 new Fields("price", "state", "product"),
                 new CassandraCqlIncrementalStateUpdater<String, Number>());
         return topology.build();

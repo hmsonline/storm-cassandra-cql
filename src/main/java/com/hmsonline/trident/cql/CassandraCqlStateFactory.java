@@ -21,10 +21,10 @@ public class CassandraCqlStateFactory implements StateFactory {
     public static final String TRIDENT_CASSANDRA_QUERY_TIMEOUT = "trident.cassandra.query.timeout";
     public static final String TRIDENT_CASSANDRA_CLUSTER_NAME = "trident.cassandra.cluster.name";    
     private static CqlClientFactory clientFactory;
-    private ConsistencyLevel consistencyLevel;
+    private ConsistencyLevel batchConsistencyLevel;
 
-    public CassandraCqlStateFactory(ConsistencyLevel consistencyLevel){
-        this.consistencyLevel = consistencyLevel;
+    public CassandraCqlStateFactory(ConsistencyLevel batchConsistencyLevel){
+        this.batchConsistencyLevel = batchConsistencyLevel;
     }
     
     @Override
@@ -32,9 +32,9 @@ public class CassandraCqlStateFactory implements StateFactory {
         // worth synchronizing here?
         if (clientFactory == null) {
             String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-            clientFactory = new CqlClientFactory(hosts, ConsistencyLevel.LOCAL_QUORUM);
+            clientFactory = new CqlClientFactory(hosts, batchConsistencyLevel);
         }
         LOG.debug("Creating State for partition [{}] of [{}]", new Object[]{partitionIndex, numPartitions});
-        return new CassandraCqlState(CassandraCqlStateFactory.clientFactory, consistencyLevel);
+        return new CassandraCqlState(CassandraCqlStateFactory.clientFactory, batchConsistencyLevel);
     }
 }
