@@ -24,8 +24,10 @@ public class CassandraCqlIncrementalStateFactory<K, V> implements StateFactory {
     private static CqlClientFactory clientFactory;
     private CombinerAggregator<V> aggregator;
     private CqlIncrementMapper<K, V> mapper;
+    private ConsistencyLevel batchConsistencyLevel;
 
-    public CassandraCqlIncrementalStateFactory(CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper) {
+    public CassandraCqlIncrementalStateFactory(CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper,
+            ConsistencyLevel batchConsistencyLevel) {
         this.aggregator = aggregator;
         this.mapper = mapper;
     }
@@ -35,7 +37,7 @@ public class CassandraCqlIncrementalStateFactory<K, V> implements StateFactory {
         // worth synchronizing here?
         if (clientFactory == null) {
             String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-            clientFactory = new CqlClientFactory(hosts, ConsistencyLevel.LOCAL_QUORUM);
+            clientFactory = new CqlClientFactory(hosts, batchConsistencyLevel);
         }
         LOG.debug("Creating State for partition [{}] of [{}]", new Object[]{partitionIndex, numPartitions});
         return new CassandraCqlIncrementalState<K, V>(CassandraCqlIncrementalStateFactory.clientFactory, aggregator, mapper, partitionIndex);

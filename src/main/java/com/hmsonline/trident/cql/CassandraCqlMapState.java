@@ -21,6 +21,7 @@ import backtype.storm.topology.ReportedFailedException;
 
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.BatchStatement.Type;
+import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
@@ -72,7 +73,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
 
     @SuppressWarnings("rawtypes")
     public static StateFactory opaque(CqlRowMapper mapper, Options<OpaqueValue> opts) {
-        return new CassandraCqlMapStateFactory(mapper, StateType.OPAQUE, opts);
+        return new CassandraCqlMapStateFactory(mapper, StateType.OPAQUE, opts, ConsistencyLevel.QUORUM);
     }
 
     @SuppressWarnings("rawtypes")
@@ -83,7 +84,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
 
     @SuppressWarnings("rawtypes")
     public static StateFactory transactional(CqlRowMapper mapper, Options<TransactionalValue> opts) {
-        return new CassandraCqlMapStateFactory(mapper, StateType.TRANSACTIONAL, opts);
+        return new CassandraCqlMapStateFactory(mapper, StateType.TRANSACTIONAL, opts, ConsistencyLevel.QUORUM);
     }
 
     @SuppressWarnings("rawtypes")
@@ -94,7 +95,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
 
     @SuppressWarnings("rawtypes")
     public static StateFactory nonTransactional(CqlRowMapper mapper, Options<Object> opts) {
-        return new CassandraCqlMapStateFactory(mapper, StateType.NON_TRANSACTIONAL, opts);
+        return new CassandraCqlMapStateFactory(mapper, StateType.NON_TRANSACTIONAL, opts, ConsistencyLevel.QUORUM);
     }
 
     //////////////////////////////
