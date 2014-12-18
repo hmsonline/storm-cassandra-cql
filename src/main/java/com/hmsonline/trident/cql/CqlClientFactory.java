@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ProtocolOptions;
+import com.datastax.driver.core.QueryOptions;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.NoHostAvailableException;
 
@@ -25,12 +27,30 @@ public class CqlClientFactory implements Serializable {
     private Map<String, Session> sessions = new HashMap<String, Session>();
     private Session defaultSession = null;
     private String[] hosts;
+    private String clusterName = null;
+    private ConsistencyLevel consistencyLevel= null;
+    private ConsistencyLevel serialConsistencyLevel = null;
+
     protected static Cluster cluster;
 
-    @SuppressWarnings("rawtypes")
-    public CqlClientFactory(Map configuration) {
-        String hostProperty = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-        hosts = hostProperty.split(",");
+    public CqlClientFactory(String hosts) {
+        this(hosts, null, QueryOptions.DEFAULT_CONSISTENCY_LEVEL, QueryOptions.DEFAULT_SERIAL_CONSISTENCY_LEVEL);
+    }
+
+    public CqlClientFactory(String hosts, ConsistencyLevel clusterConsistency) {
+        this(hosts, null, clusterConsistency, null);
+    }
+    
+    public CqlClientFactory(String hosts, String clusterName, ConsistencyLevel clusterConsistency, 
+            ConsistencyLevel conditionalUpdateConsistency) {
+        this.hosts = hosts.split(",");
+        this.consistencyLevel = clusterConsistency;
+        if (conditionalUpdateConsistency != null){
+            this.serialConsistencyLevel = conditionalUpdateConsistency;
+        }
+        if (clusterName != null) {
+            this.clusterName = clusterName;
+        }
     }
 
     public synchronized Session getSession(String keyspace) {
@@ -63,7 +83,18 @@ public class CqlClientFactory implements Serializable {
                         LOG.debug("Connecting to [" + host + "] with port [" + ProtocolOptions.DEFAULT_PORT + "]");
                     }
                 }
-                cluster = Cluster.builder().addContactPointsWithPorts(sockets).build();
+
+                Cluster.Builder builder = Cluster.builder().addContactPointsWithPorts(sockets);
+                QueryOptions queryOptions = new QueryOptions();
+                queryOptions.setConsistencyLevel(consistencyLevel);
+                queryOptions.setSerialConsistencyLevel(serialConsistencyLevel);
+                builder = builder.withQueryOptions(queryOptions);
+
+                if (StringUtils.isNotEmpty(clusterName)) {
+                    builder = builder.withClusterName(clusterName);
+                }
+
+                cluster = builder.build();
                 if (cluster == null) {
                     throw new RuntimeException("Critical error: cluster is null after "
                             + "attempting to build with contact points (hosts) " + hosts);

@@ -1,9 +1,14 @@
 package com.hmsonline.trident.cql.incremental;
 
 import backtype.storm.task.IMetricsContext;
+
+import com.datastax.driver.core.ConsistencyLevel;
+import com.hmsonline.trident.cql.CassandraCqlStateFactory;
 import com.hmsonline.trident.cql.CqlClientFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import storm.trident.operation.CombinerAggregator;
 import storm.trident.state.State;
 import storm.trident.state.StateFactory;
@@ -29,7 +34,8 @@ public class CassandraCqlIncrementalStateFactory<K, V> implements StateFactory {
     public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {
         // worth synchronizing here?
         if (clientFactory == null) {
-            clientFactory = new CqlClientFactory(configuration);
+            String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
+            clientFactory = new CqlClientFactory(hosts, ConsistencyLevel.LOCAL_QUORUM);
         }
         LOG.debug("Creating State for partition [{}] of [{}]", new Object[]{partitionIndex, numPartitions});
         return new CassandraCqlIncrementalState<K, V>(CassandraCqlIncrementalStateFactory.clientFactory, aggregator, mapper, partitionIndex);

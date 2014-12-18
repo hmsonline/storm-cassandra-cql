@@ -14,6 +14,7 @@ import storm.trident.state.map.TransactionalMap;
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
 
+import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlMapState.Options;
 import com.hmsonline.trident.cql.mappers.CqlRowMapper;
 
@@ -44,7 +45,8 @@ public class CassandraCqlMapStateFactory implements StateFactory {
     public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {
 
         if (clientFactory == null) {
-            clientFactory = new CqlClientFactory(configuration);
+            String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
+            clientFactory = new CqlClientFactory(hosts, ConsistencyLevel.LOCAL_QUORUM);
         }
 
         CassandraCqlMapState state = new CassandraCqlMapState(clientFactory.getSession(options.keyspace), mapper, options, configuration);
