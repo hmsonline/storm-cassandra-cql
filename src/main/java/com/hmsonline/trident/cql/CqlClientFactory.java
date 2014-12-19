@@ -70,7 +70,7 @@ public class CqlClientFactory implements Serializable {
     }
     
     public Cluster getCluster() {
-        if (cluster == null) {
+        if (cluster == null || cluster.isClosed()) {
             try {
                 List<InetSocketAddress> sockets = new ArrayList<InetSocketAddress>();
                 for (String host : hosts) {
