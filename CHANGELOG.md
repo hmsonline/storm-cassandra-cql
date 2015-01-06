@@ -1,3 +1,7 @@
+## 0.2.4
+
+* Bump cassandra-driver-core dependency to 2.1.4
+
 ## 0.2.1
 
 * [#27][]: Use QUORUM by default instead of LOCAL_QUORUM
