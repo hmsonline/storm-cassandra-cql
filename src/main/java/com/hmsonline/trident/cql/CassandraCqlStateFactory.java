@@ -16,10 +16,13 @@ public class CassandraCqlStateFactory implements StateFactory {
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlStateFactory.class);
     public static final String TRIDENT_CASSANDRA_CQL_HOSTS = "trident.cassandra.cql.hosts";
+    public static final String TRIDENT_CASSANDRA_MAX_BATCH_SIZE = "trident.cassandra.maxbatchsize";
     public static final String TRIDENT_CASSANDRA_CONSISTENCY = "trident.cassandra.consistency";
     public static final String TRIDENT_CASSANDRA_SERIAL_CONSISTENCY = "trident.cassandra.serial.consistency";
     public static final String TRIDENT_CASSANDRA_QUERY_TIMEOUT = "trident.cassandra.query.timeout";
-    public static final String TRIDENT_CASSANDRA_CLUSTER_NAME = "trident.cassandra.cluster.name";    
+    public static final String TRIDENT_CASSANDRA_CLUSTER_NAME = "trident.cassandra.cluster.name";
+
+    public static final int DEFAULT_MAX_BATCH_SIZE = 100;
     private static CqlClientFactory clientFactory;
     private ConsistencyLevel batchConsistencyLevel;
 
@@ -34,7 +37,9 @@ public class CassandraCqlStateFactory implements StateFactory {
             String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
             clientFactory = new CqlClientFactory(hosts, batchConsistencyLevel);
         }
+        final String maxBatchSizeString = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_MAX_BATCH_SIZE);
+        final int maxBatchSize = (maxBatchSizeString == null) ? DEFAULT_MAX_BATCH_SIZE : Integer.parseInt((String) maxBatchSizeString);
         LOG.debug("Creating State for partition [{}] of [{}]", new Object[]{partitionIndex, numPartitions});
-        return new CassandraCqlState(CassandraCqlStateFactory.clientFactory, batchConsistencyLevel);
+        return new CassandraCqlState(CassandraCqlStateFactory.clientFactory, maxBatchSize, batchConsistencyLevel);
     }
 }
