@@ -16,14 +16,13 @@ import com.datastax.driver.core.Statement;
 
 public class CassandraCqlState implements State {
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlState.class);
-    private static final int DEFAULT_MAX_BATCH_SIZE = 100;
     private CqlClientFactory clientFactory;
     private int maxBatchSize;
     private ConsistencyLevel batchConsistencyLevel;
     List<Statement> statements = new ArrayList<Statement>();
     
     public CassandraCqlState(CqlClientFactory clientFactory, ConsistencyLevel batchConsistencyLevel) {
-        this(clientFactory, DEFAULT_MAX_BATCH_SIZE, batchConsistencyLevel);
+        this(clientFactory, CassandraCqlStateFactory.DEFAULT_MAX_BATCH_SIZE, batchConsistencyLevel);
     }
     
     public CassandraCqlState(CqlClientFactory clientFactory, int maxBatchSize, ConsistencyLevel batchConsistencyLevel) {
