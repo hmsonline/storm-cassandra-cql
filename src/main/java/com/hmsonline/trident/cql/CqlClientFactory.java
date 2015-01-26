@@ -28,24 +28,24 @@ public class CqlClientFactory implements Serializable {
     private Session defaultSession = null;
     private String[] hosts;
     private String clusterName = null;
-    private ConsistencyLevel consistencyLevel= null;
+    private ConsistencyLevel clusterConsistencyLevel= null;
     private ConsistencyLevel serialConsistencyLevel = null;
 
     protected static Cluster cluster;
     private final ProtocolOptions.Compression compression;
 
     public CqlClientFactory(String hosts) {
-        this(hosts, null, ConsistencyLevel.QUORUM, ConsistencyLevel.QUORUM, ProtocolOptions.Compression.NONE);
+        this(hosts, null, ConsistencyLevel.QUORUM, QueryOptions.DEFAULT_SERIAL_CONSISTENCY_LEVEL, ProtocolOptions.Compression.NONE);
     }
 
     public CqlClientFactory(String hosts, ConsistencyLevel clusterConsistency) {
-        this(hosts, null, clusterConsistency, ConsistencyLevel.QUORUM, ProtocolOptions.Compression.NONE);
+        this(hosts, null, clusterConsistency, QueryOptions.DEFAULT_SERIAL_CONSISTENCY_LEVEL, ProtocolOptions.Compression.NONE);
     }
 
     public CqlClientFactory(String hosts, String clusterName, ConsistencyLevel clusterConsistency,
                             ConsistencyLevel conditionalUpdateConsistency, ProtocolOptions.Compression compression) {
         this.hosts = hosts.split(",");
-        this.consistencyLevel = clusterConsistency;
+        this.clusterConsistencyLevel = clusterConsistency;
         if (conditionalUpdateConsistency != null){
             this.serialConsistencyLevel = conditionalUpdateConsistency;
         }
@@ -91,7 +91,7 @@ public class CqlClientFactory implements Serializable {
 
                 Cluster.Builder builder = Cluster.builder().addContactPointsWithPorts(sockets).withCompression(compression);
                 QueryOptions queryOptions = new QueryOptions();
-                queryOptions.setConsistencyLevel(consistencyLevel);
+                queryOptions.setConsistencyLevel(clusterConsistencyLevel);
                 queryOptions.setSerialConsistencyLevel(serialConsistencyLevel);
                 builder = builder.withQueryOptions(queryOptions);
 

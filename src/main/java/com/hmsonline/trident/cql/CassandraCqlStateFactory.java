@@ -37,7 +37,11 @@ public class CassandraCqlStateFactory implements StateFactory {
         // worth synchronizing here?
         if (clientFactory == null) {
             String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-            String compressionLevel = (String) configuration.getOrDefault(CassandraCqlStateFactory.TRIDENT_CASSANDRA_COMPRESSION, ProtocolOptions.Compression.NONE.name());
+            String compressionLevel = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_COMPRESSION);
+            if (compressionLevel == null){
+                // TODO: Can change to getOrDefault when we move to JDK 8
+                compressionLevel = ProtocolOptions.Compression.NONE.name();
+            }
             clientFactory = new CqlClientFactory(hosts, null, batchConsistencyLevel, ConsistencyLevel.QUORUM, ProtocolOptions.Compression.valueOf(compressionLevel));
         }
         final String maxBatchSizeString = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_MAX_BATCH_SIZE);
