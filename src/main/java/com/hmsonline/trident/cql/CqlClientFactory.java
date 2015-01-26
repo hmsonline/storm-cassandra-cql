@@ -28,23 +28,23 @@ public class CqlClientFactory implements Serializable {
     private Session defaultSession = null;
     private String[] hosts;
     private String clusterName = null;
-    private ConsistencyLevel consistencyLevel= null;
+    private ConsistencyLevel clusterConsistencyLevel= null;
     private ConsistencyLevel serialConsistencyLevel = null;
 
     protected static Cluster cluster;
 
     public CqlClientFactory(String hosts) {
-        this(hosts, null, ConsistencyLevel.QUORUM, ConsistencyLevel.QUORUM);
+        this(hosts, null, ConsistencyLevel.QUORUM, QueryOptions.DEFAULT_SERIAL_CONSISTENCY_LEVEL);
     }
 
     public CqlClientFactory(String hosts, ConsistencyLevel clusterConsistency) {
-        this(hosts, null, clusterConsistency, ConsistencyLevel.QUORUM);
+        this(hosts, null, clusterConsistency, QueryOptions.DEFAULT_SERIAL_CONSISTENCY_LEVEL);
     }
     
     public CqlClientFactory(String hosts, String clusterName, ConsistencyLevel clusterConsistency, 
             ConsistencyLevel conditionalUpdateConsistency) {
         this.hosts = hosts.split(",");
-        this.consistencyLevel = clusterConsistency;
+        this.clusterConsistencyLevel = clusterConsistency;
         if (conditionalUpdateConsistency != null){
             this.serialConsistencyLevel = conditionalUpdateConsistency;
         }
@@ -89,7 +89,7 @@ public class CqlClientFactory implements Serializable {
 
                 Cluster.Builder builder = Cluster.builder().addContactPointsWithPorts(sockets);
                 QueryOptions queryOptions = new QueryOptions();
-                queryOptions.setConsistencyLevel(consistencyLevel);
+                queryOptions.setConsistencyLevel(clusterConsistencyLevel);
                 queryOptions.setSerialConsistencyLevel(serialConsistencyLevel);
                 builder = builder.withQueryOptions(queryOptions);
 
