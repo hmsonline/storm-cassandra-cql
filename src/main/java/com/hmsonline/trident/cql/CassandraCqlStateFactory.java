@@ -2,6 +2,7 @@ package com.hmsonline.trident.cql;
 
 import java.util.Map;
 
+import com.datastax.driver.core.ProtocolOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ public class CassandraCqlStateFactory implements StateFactory {
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlStateFactory.class);
     public static final String TRIDENT_CASSANDRA_CQL_HOSTS = "trident.cassandra.cql.hosts";
     public static final String TRIDENT_CASSANDRA_MAX_BATCH_SIZE = "trident.cassandra.maxbatchsize";
+    public static final String TRIDENT_CASSANDRA_COMPRESSION = "trident.cassandra.compression";
     public static final String TRIDENT_CASSANDRA_CONSISTENCY = "trident.cassandra.consistency";
     public static final String TRIDENT_CASSANDRA_SERIAL_CONSISTENCY = "trident.cassandra.serial.consistency";
     public static final String TRIDENT_CASSANDRA_QUERY_TIMEOUT = "trident.cassandra.query.timeout";
@@ -35,7 +37,8 @@ public class CassandraCqlStateFactory implements StateFactory {
         // worth synchronizing here?
         if (clientFactory == null) {
             String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-            clientFactory = new CqlClientFactory(hosts, batchConsistencyLevel);
+            String compressionLevel = (String) configuration.getOrDefault(CassandraCqlStateFactory.TRIDENT_CASSANDRA_COMPRESSION, ProtocolOptions.Compression.NONE.name());
+            clientFactory = new CqlClientFactory(hosts, null, batchConsistencyLevel, ConsistencyLevel.QUORUM, ProtocolOptions.Compression.valueOf(compressionLevel));
         }
         final String maxBatchSizeString = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_MAX_BATCH_SIZE);
         final int maxBatchSize = (maxBatchSizeString == null) ? DEFAULT_MAX_BATCH_SIZE : Integer.parseInt((String) maxBatchSizeString);
