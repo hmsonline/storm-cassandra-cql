@@ -53,6 +53,7 @@ public class CassandraCqlState implements State {
         if(i > 0) {
             clientFactory.getSession().execute(batch);
         }
+        this.statements.clear();
     }
 
     public void addStatement(Statement statement) {
