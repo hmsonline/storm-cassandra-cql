@@ -8,6 +8,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import com.hmsonline.trident.cql.CassandraCqlMapState;
 import com.hmsonline.trident.cql.CassandraCqlStateFactory;
+import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import storm.trident.TridentState;
@@ -91,7 +92,7 @@ public class WordCountTopology {
 
     public static void main(String[] args) throws Exception {
         final Config configuration = new Config();
-        configuration.put(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
         final LocalCluster cluster = new LocalCluster();
         LocalDRPC client = new LocalDRPC();
 

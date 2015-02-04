@@ -48,8 +48,7 @@ public class CassandraCqlMapStateFactory implements StateFactory {
     public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {
 
         if (clientFactory == null) {
-            String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-            clientFactory = new CqlClientFactory(hosts, batchConsistencyLevel);
+            clientFactory = new MapConfiguredCqlClientFactory(configuration);
         }
 
         CassandraCqlMapState state = new CassandraCqlMapState(clientFactory.getSession(options.keyspace), mapper, options, configuration);
@@ -70,5 +69,4 @@ public class CassandraCqlMapStateFactory implements StateFactory {
 
         return new SnapshottableMap(mapState, new Values(options.globalKey));
     }
-
 }

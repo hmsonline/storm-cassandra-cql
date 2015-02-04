@@ -2,21 +2,17 @@ package com.hmsonline.trident.cql;
 
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ProtocolOptions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-
-@RunWith(JUnit4.class)
 public class CqlClientFactoryTest {
-	private static final Logger LOG = LoggerFactory.getLogger(CqlClientFactoryTest.class);
-	public CqlClientFactory clientFactory;
 
-	@Test
-	public void testCompressionConf() throws Exception {
-		clientFactory = new CqlClientFactory("", null, null, ConsistencyLevel.ANY, ProtocolOptions.Compression.valueOf("LZ4"));
-		clientFactory = new CqlClientFactory("", null, null, ConsistencyLevel.ANY, ProtocolOptions.Compression.valueOf("NONE"));
-	}
+    public static final String HOSTS = "localhost,remotehost:1234";
+    public static final String CLUSTER_NAME = "Test Cluster";
+    public static final ConsistencyLevel DEFAULT_CONSISTENCY_LEVEL = ConsistencyLevel.LOCAL_QUORUM;
+    public static final ConsistencyLevel DEFAULT_SERIAL_CONSISTENCY_LEVEL = ConsistencyLevel.SERIAL;
+    public static final ProtocolOptions.Compression COMPRESSION = ProtocolOptions.Compression.LZ4;
+    public static final String READ_TIMEOUT = "10000";
+    public static final String CONNECT_TIMEOUT = "2000";
+    public static final String DATA_CENTER_NAME = "philly";
+
+
 }

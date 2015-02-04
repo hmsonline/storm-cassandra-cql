@@ -7,6 +7,7 @@ import backtype.storm.tuple.Fields;
 
 import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlStateFactory;
+import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
 
@@ -27,7 +28,7 @@ public class SalesAnalyticsTopology {
         Stream inputStream = topology.newStream("sales", spout);
         SalesAnalyticsMapper mapper = new SalesAnalyticsMapper();
         inputStream.partitionPersist(
-                new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper, ConsistencyLevel.QUORUM),
+                new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper),
                 new Fields("price", "state", "product"),
                 new CassandraCqlIncrementalStateUpdater<String, Number>());
         return topology.build();
@@ -35,7 +36,7 @@ public class SalesAnalyticsTopology {
 
     public static void main(String[] args) throws Exception {
         final Config configuration = new Config();
-        configuration.put(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
         final LocalCluster cluster = new LocalCluster();
         LOG.info("Submitting topology.");
         cluster.submitTopology("cqlexample", configuration, buildTopology());

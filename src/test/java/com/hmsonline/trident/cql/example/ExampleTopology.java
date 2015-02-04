@@ -1,5 +1,6 @@
 package com.hmsonline.trident.cql.example;
 
+import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ public class ExampleTopology {
 
     public static void main(String[] args) throws Exception {
         final Config configuration = new Config();
-        configuration.put(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
         final LocalCluster cluster = new LocalCluster();
         LOG.info("Submitting topology.");
         cluster.submitTopology("cqlexample", configuration, buildTopology());

@@ -7,6 +7,7 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.set;
 import java.io.Serializable;
 import java.util.List;
 
+import com.datastax.driver.core.ConsistencyLevel;
 import storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.Row;
@@ -47,7 +48,12 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
 
     @Override
     public SalesState currentState(String key, List<Row> rows) {
-        return new SalesState(rows.get(0).getInt(VALUE_NAME),rows.get(0).getString("partitions"));
+        if (rows.size() == 0) {
+            return new SalesState(null, null);
+        } else {
+            return new SalesState(rows.get(0).getInt(VALUE_NAME), "0");
+            // return new SalesState(rows.get(0).getInt(VALUE_NAME), rows.get(0).getString("partitions"));
+        }
     }
 
     @Override

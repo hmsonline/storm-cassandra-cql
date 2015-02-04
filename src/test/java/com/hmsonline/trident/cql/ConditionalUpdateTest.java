@@ -20,7 +20,6 @@ import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
@@ -35,11 +34,12 @@ import com.datastax.driver.core.querybuilder.Update;
 public class ConditionalUpdateTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConditionalUpdateTest.class);
     public CqlClientFactory clientFactory;
-    public Map<String, String> configuration;
+    public Map<String, String> configuration = new HashMap<String, String>();
     public String APPLIED_COLUMN = "[applied]";
 
     public ConditionalUpdateTest() {
-        clientFactory = new CqlClientFactory("localhost", ConsistencyLevel.QUORUM);
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
+        clientFactory = new MapConfiguredCqlClientFactory(configuration);
     }
 
     public void assertValue(String k, Integer expectedValue) {

@@ -2,6 +2,7 @@ package com.hmsonline.trident.cql;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.insertInto;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEYSPACE_NAME;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEY_NAME;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.TABLE_NAME;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.datastax.driver.core.querybuilder.Insert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +39,9 @@ public class IncrementalStateTest extends ConditionalUpdateTest {
     private static List<String> FIELDS = Arrays.asList("price", "state", "product");
 
     public IncrementalStateTest() {
+        super();
         SalesAnalyticsMapper mapper = new SalesAnalyticsMapper();
-        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper, ConsistencyLevel.QUORUM);
+        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper);
         stateUpdater = new CassandraCqlIncrementalStateUpdater<String, Number>();
     }
 
@@ -56,6 +59,9 @@ public class IncrementalStateTest extends ConditionalUpdateTest {
         // Let's get some initial state in the database
         CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(
                 configuration, null, 5, 50);
+
+        //Insert insertStament = insertInto(KEYSPACE_NAME, TABLE_NAME).value("k","MD").value("v", 99);
+        //clientFactory.getSession().execute(insertStament);
         this.incrementState(state);
         state.commit(Long.MAX_VALUE);
         this.assertValue("MD", 100);
