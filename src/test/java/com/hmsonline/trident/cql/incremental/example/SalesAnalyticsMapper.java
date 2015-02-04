@@ -31,7 +31,7 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
 
     @Override
     public Statement read(String key) {
-        Select statement = select().column("v").from(KEYSPACE_NAME, TABLE_NAME);
+        Select statement = select().column(VALUE_NAME).from(KEYSPACE_NAME, TABLE_NAME);
         statement.where(eq(KEY_NAME, key));
         return statement;
     }
@@ -51,8 +51,7 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
         if (rows.size() == 0) {
             return new SalesState(null, null);
         } else {
-            return new SalesState(rows.get(0).getInt(VALUE_NAME), "0");
-            // return new SalesState(rows.get(0).getInt(VALUE_NAME), rows.get(0).getString("partitions"));
+            return new SalesState(rows.get(0).getInt(VALUE_NAME), "");
         }
     }
 

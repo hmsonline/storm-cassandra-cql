@@ -30,18 +30,15 @@ public class CassandraCqlMapStateFactory implements StateFactory {
     private CqlClientFactory clientFactory;
     private StateType stateType;
     private Options<?> options;
-    private ConsistencyLevel batchConsistencyLevel;
 
     @SuppressWarnings("rawtypes")
     private CqlRowMapper mapper;
 
     @SuppressWarnings({"rawtypes"})
-    public CassandraCqlMapStateFactory(CqlRowMapper mapper, StateType stateType, Options options, 
-            ConsistencyLevel batchConsistencyLevel) {
+    public CassandraCqlMapStateFactory(CqlRowMapper mapper, StateType stateType, Options options) {
         this.stateType = stateType;
         this.options = options;
         this.mapper = mapper;
-        this.batchConsistencyLevel = batchConsistencyLevel;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

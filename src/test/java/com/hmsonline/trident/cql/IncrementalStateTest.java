@@ -2,7 +2,6 @@ package com.hmsonline.trident.cql;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
-import static com.datastax.driver.core.querybuilder.QueryBuilder.insertInto;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEYSPACE_NAME;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEY_NAME;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.TABLE_NAME;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.datastax.driver.core.querybuilder.Insert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +19,6 @@ import storm.trident.operation.builtin.Sum;
 import storm.trident.testing.MockTridentTuple;
 import storm.trident.tuple.TridentTuple;
 
-import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.querybuilder.Delete;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalState;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
@@ -33,7 +30,7 @@ import com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper;
  */
 @Ignore
 @RunWith(JUnit4.class)
-public class IncrementalStateTest extends ConditionalUpdateTest {
+public class IncrementalStateTest extends StateTest {
     private CassandraCqlIncrementalStateFactory<String, Number> stateFactory;
     private CassandraCqlIncrementalStateUpdater<String, Number> stateUpdater;
     private static List<String> FIELDS = Arrays.asList("price", "state", "product");
@@ -62,17 +59,17 @@ public class IncrementalStateTest extends ConditionalUpdateTest {
 
         //Insert insertStament = insertInto(KEYSPACE_NAME, TABLE_NAME).value("k","MD").value("v", 99);
         //clientFactory.getSession().execute(insertStament);
-        this.incrementState(state);
+        incrementState(state);
         state.commit(Long.MAX_VALUE);
-        this.assertValue("MD", 100);
+        assertValue("MD", 100);
 
         // Let's create two state objects, to simulate
         // multi-threaded/distributed operations.
         CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(
                 configuration, null, 55, 122);
-        this.incrementState(state1);
+        incrementState(state1);
         state.commit(Long.MAX_VALUE);
-        this.assertValue("MD", 200);
+        assertValue("MD", 200);
     }
 
     @SuppressWarnings("unchecked")

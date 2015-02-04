@@ -7,7 +7,7 @@ public class SalesState implements PersistedState<Number> {
     String partitionsKey;
     public SalesState(Number value,String partitionsKey){
         this.value = value;
-        this.partitionsKey=partitionsKey;
+        this.partitionsKey = partitionsKey;
     }
     
     @Override

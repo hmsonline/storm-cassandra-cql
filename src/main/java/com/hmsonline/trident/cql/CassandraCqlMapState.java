@@ -73,7 +73,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
 
     @SuppressWarnings("rawtypes")
     public static StateFactory opaque(CqlRowMapper mapper, Options<OpaqueValue> opts) {
-        return new CassandraCqlMapStateFactory(mapper, StateType.OPAQUE, opts, ConsistencyLevel.QUORUM);
+        return new CassandraCqlMapStateFactory(mapper, StateType.OPAQUE, opts);
     }
 
     @SuppressWarnings("rawtypes")
@@ -84,7 +84,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
 
     @SuppressWarnings("rawtypes")
     public static StateFactory transactional(CqlRowMapper mapper, Options<TransactionalValue> opts) {
-        return new CassandraCqlMapStateFactory(mapper, StateType.TRANSACTIONAL, opts, ConsistencyLevel.QUORUM);
+        return new CassandraCqlMapStateFactory(mapper, StateType.TRANSACTIONAL, opts);
     }
 
     @SuppressWarnings("rawtypes")
@@ -95,7 +95,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
 
     @SuppressWarnings("rawtypes")
     public static StateFactory nonTransactional(CqlRowMapper mapper, Options<Object> opts) {
-        return new CassandraCqlMapStateFactory(mapper, StateType.NON_TRANSACTIONAL, opts, ConsistencyLevel.QUORUM);
+        return new CassandraCqlMapStateFactory(mapper, StateType.NON_TRANSACTIONAL, opts);
     }
 
     //////////////////////////////
