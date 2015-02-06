@@ -56,18 +56,28 @@ public class IncrementalStateTest extends CqlTestEnvironment {
 
         // Let's get some initial state in the database
 
-        CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 5, 50);
+        CassandraCqlIncrementalState<String, Number> state = 
+                (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 5, 50);
         incrementState(state);
-        state.commit(Long.MAX_VALUE);
         assertValue("MD", 100);
 
-        // Let's create two state objects, to simulate
-        // multi-threaded/distributed operations.
-        CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 55,
-                122);
+        CassandraCqlIncrementalState<String, Number> state1 =
+                (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 55, 122);
         incrementState(state1);
-        state.commit(Long.MAX_VALUE);
         assertValue("MD", 200);
+    }
+
+    @Test
+    public void testValueAggregations() {
+        clearState();
+        CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 5, 50);
+        state.beginCommit(Long.MAX_VALUE);
+        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(100, "MD", "bike")));
+        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(50, "PA", "bike")));
+        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(10, "PA", "bike")));
+        state.commit(Long.MAX_VALUE);
+        assertValue("MD", 100);
+        assertValue("PA", 60);
     }
 
     private void incrementState(CassandraCqlIncrementalState<String, Number> state) {
@@ -76,5 +86,6 @@ public class IncrementalStateTest extends CqlTestEnvironment {
         mockTuples.add(mockTuple);
         state.beginCommit(Long.MAX_VALUE);
         stateUpdater.updateState(state, mockTuples, null);
+        state.commit(Long.MAX_VALUE);
     }
 }

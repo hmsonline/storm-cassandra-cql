@@ -65,12 +65,12 @@ public class CassandraCqlIncrementalState<K, V> implements State {
 
     @Override
     public void commit(Long txid) {
-        boolean applied = false;
         DriverException lastException = null;
         // Read current value.
         //if we failed to apply the update , maybe the state has change already , we need to calculate the new state and apply it again
         for (Map.Entry<K, V> entry : aggregateValues.entrySet()) {
             int attempts = 0;
+            boolean applied = false;
             while (!applied && attempts < maxAttempts) {
                 try{
                     applied = updateState(entry, txid);
@@ -95,7 +95,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         LOG.debug("EXECUTING [{}]", readStatement.toString());
 
         if(aggregateValues.keySet().size() > 1) {
-            LOG.debug("WARNING size is could make this fail [{}]", aggregateValues.keySet().size());
+            LOG.debug("WARNING size is [{}], which could make this fail.", aggregateValues.keySet().size());
         }
         ResultSet results = clientFactory.getSession().execute(readStatement);
 

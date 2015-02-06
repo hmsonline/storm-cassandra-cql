@@ -34,6 +34,7 @@ public class CqlTestEnvironment {
     public static CassandraCQLUnit cqlUnit;
 
     public CqlTestEnvironment() {
+        setup();
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, "localhost");
         clientFactory = new CqlUnitClientFactory(configuration, cqlUnit);
     }
@@ -53,6 +54,7 @@ public class CqlTestEnvironment {
         Select selectStatement = select().column("v").from(KEYSPACE_NAME, TABLE_NAME);
         selectStatement.where(eq(KEY_NAME, k));
         ResultSet results = getSession().execute(selectStatement);
+        LOG.debug("EXECUTING [{}]", selectStatement.toString());
         Integer actualValue = results.one().getInt(VALUE_NAME);
         assertEquals(expectedValue, actualValue);
     }
