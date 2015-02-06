@@ -1,22 +1,24 @@
 package com.hmsonline.trident.cql;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ProtocolOptions;
-import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
-import junit.framework.Assert;
-import org.junit.Test;
-
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import junit.framework.Assert;
 
-public class MapConfiguredCqlClientFactoryTest extends CqlClientFactoryTest {
+import org.cassandraunit.CassandraCQLUnit;
+import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ProtocolOptions;
+
+public class MapConfiguredCqlClientFactoryTest extends CqlClientFactoryTestConstants {    
     @Test
     public void testGetClusterBuilder() throws Exception {
-        final Map<String, String> configuration = new HashMap<String,String>();
+        final Map<Object, Object> configuration = new HashMap<Object,Object>();
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, HOSTS);
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CLUSTER_NAME, CLUSTER_NAME);
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_READ_TIMEOUT, READ_TIMEOUT);
@@ -44,8 +46,9 @@ public class MapConfiguredCqlClientFactoryTest extends CqlClientFactoryTest {
     }
 
     @Test(expected = IllegalStateException.class)
+    @Ignore
     public void testCompression() {
-        final Map<String, String> configuration = new HashMap<String,String>();
+        final Map<Object, Object> configuration = new HashMap<Object,Object>();
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, HOSTS);
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_COMPRESSION, COMPRESSION.name());
         final CqlClientFactory factory =

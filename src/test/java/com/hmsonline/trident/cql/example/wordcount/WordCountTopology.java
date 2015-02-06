@@ -7,7 +7,6 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import com.hmsonline.trident.cql.CassandraCqlMapState;
-import com.hmsonline.trident.cql.CassandraCqlStateFactory;
 import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

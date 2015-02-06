@@ -7,7 +7,6 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.set;
 import java.io.Serializable;
 import java.util.List;
 
-import com.datastax.driver.core.ConsistencyLevel;
 import storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.Row;

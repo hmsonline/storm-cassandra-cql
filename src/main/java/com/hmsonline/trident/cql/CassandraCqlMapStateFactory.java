@@ -14,7 +14,6 @@ import storm.trident.state.map.TransactionalMap;
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
 
-import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlMapState.Options;
 import com.hmsonline.trident.cql.mappers.CqlRowMapper;
 

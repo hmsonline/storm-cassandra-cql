@@ -1,19 +1,14 @@
 package com.hmsonline.trident.cql;
 
 import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ConsistencyLevel;
-import com.datastax.driver.core.ProtocolOptions;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
 import java.net.InetSocketAddress;
 
-import static org.junit.Assert.*;
-
 @RunWith(JUnit4.class)
-public class ConstructorConfiguredCqlClientFactoryTest extends CqlClientFactoryTest {
+public class ConstructorConfiguredCqlClientFactoryTest extends CqlClientFactoryTestConstants {
 
     @Test
     public void testGetCluster() {

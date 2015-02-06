@@ -1,7 +1,6 @@
 package com.hmsonline.trident.cql;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
-import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.set;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.update;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEYSPACE_NAME;
@@ -9,22 +8,18 @@ import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.TABLE_NAME;
 import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.VALUE_NAME;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.querybuilder.Update;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.
  */
-@Ignore
 @RunWith(JUnit4.class)
-public class ConditionalUpdateTest extends StateTest {
-    private static final Logger LOG = LoggerFactory.getLogger(ConditionalUpdateTest.class);
+public class ConditionalUpdateTest extends CqlTestEnvironment {
+    //private static final Logger LOG = LoggerFactory.getLogger(ConditionalUpdateTest.class);
     public String APPLIED_COLUMN = "[applied]";
 
     public ConditionalUpdateTest() {

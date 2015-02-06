@@ -8,9 +8,9 @@ import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -28,17 +28,18 @@ import com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper;
 /**
  * Test that demonstrates how to construct and use conditional updates.
  */
-@Ignore
 @RunWith(JUnit4.class)
-public class IncrementalStateTest extends StateTest {
+public class IncrementalStateTest extends CqlTestEnvironment {
     private CassandraCqlIncrementalStateFactory<String, Number> stateFactory;
     private CassandraCqlIncrementalStateUpdater<String, Number> stateUpdater;
+    private CqlClientFactory clientFactory;
     private static List<String> FIELDS = Arrays.asList("price", "state", "product");
 
     public IncrementalStateTest() {
         super();
         SalesAnalyticsMapper mapper = new SalesAnalyticsMapper();
-        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper);
+        clientFactory = new CqlUnitClientFactory(new HashMap<Object, Object>(), cqlUnit);
+        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper, clientFactory);
         stateUpdater = new CassandraCqlIncrementalStateUpdater<String, Number>();
     }
 
@@ -54,25 +55,21 @@ public class IncrementalStateTest extends StateTest {
         clearState();
 
         // Let's get some initial state in the database
-        CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(
-                configuration, null, 5, 50);
 
-        //Insert insertStament = insertInto(KEYSPACE_NAME, TABLE_NAME).value("k","MD").value("v", 99);
-        //clientFactory.getSession().execute(insertStament);
+        CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 5, 50);
         incrementState(state);
         state.commit(Long.MAX_VALUE);
         assertValue("MD", 100);
 
         // Let's create two state objects, to simulate
         // multi-threaded/distributed operations.
-        CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(
-                configuration, null, 55, 122);
+        CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 55,
+                122);
         incrementState(state1);
         state.commit(Long.MAX_VALUE);
         assertValue("MD", 200);
     }
 
-    @SuppressWarnings("unchecked")
     private void incrementState(CassandraCqlIncrementalState<String, Number> state) {
         MockTridentTuple mockTuple = new MockTridentTuple(FIELDS, Arrays.asList(100, "MD", "bike"));
         List<TridentTuple> mockTuples = new ArrayList<TridentTuple>();

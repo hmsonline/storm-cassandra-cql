@@ -12,7 +12,6 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ProtocolOptions;
 import com.datastax.driver.core.QueryOptions;
-import com.datastax.driver.core.exceptions.NoHostAvailableException;
 
 public class ConstructorConfiguredCqlClientFactory extends CqlClientFactory {
     private static final long serialVersionUID = 1L;

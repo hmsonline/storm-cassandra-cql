@@ -2,7 +2,6 @@ package com.hmsonline.trident.cql;
 
 import java.util.Map;
 
-import com.datastax.driver.core.ProtocolOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +25,7 @@ public class CassandraCqlStateFactory implements StateFactory {
         this.batchConsistencyLevel = batchConsistencyLevel;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {
         // worth synchronizing here?

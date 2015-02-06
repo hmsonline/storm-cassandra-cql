@@ -29,11 +29,11 @@ public class MapConfiguredCqlClientFactory extends CqlClientFactory {
     public static final String TRIDENT_CASSANDRA_CONSISTENCY = "trident.cassandra.consistency";
     public static final String TRIDENT_CASSANDRA_SERIAL_CONSISTENCY = "trident.cassandra.serial.consistency";
 
-    final Map configuration;
+    final Map<Object,Object> configuration;
 
     Cluster.Builder builder;
 
-    public MapConfiguredCqlClientFactory(final Map configuration) {
+    public MapConfiguredCqlClientFactory(final Map<Object,Object> configuration) {
         this.builder = Cluster.builder();
         this.configuration = configuration;
     }

@@ -1,6 +1,7 @@
 package com.hmsonline.trident.cql.example;
 
 import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ import com.hmsonline.trident.cql.CassandraCqlStateUpdater;
 public class ExampleTopology {
     private static final Logger LOG = LoggerFactory.getLogger(ExampleTopology.class);
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public static StormTopology buildTopology() {
         LOG.info("Building topology.");
         TridentTopology topology = new TridentTopology();

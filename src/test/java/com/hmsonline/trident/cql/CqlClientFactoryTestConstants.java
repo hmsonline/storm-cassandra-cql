@@ -3,7 +3,7 @@ package com.hmsonline.trident.cql;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ProtocolOptions;
 
-public class CqlClientFactoryTest {
+public class CqlClientFactoryTestConstants {
 
     public static final String HOSTS = "localhost,remotehost:1234";
     public static final String CLUSTER_NAME = "Test Cluster";
@@ -13,6 +13,5 @@ public class CqlClientFactoryTest {
     public static final String READ_TIMEOUT = "10000";
     public static final String CONNECT_TIMEOUT = "2000";
     public static final String DATA_CENTER_NAME = "philly";
-
 
 }
