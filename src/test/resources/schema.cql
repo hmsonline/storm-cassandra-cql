@@ -1,23 +1,23 @@
-CREATE TABLE mytable (
+CREATE TABLE mykeyspace.mytable (
     t int,
     col1 text,
     primary key (t)
 );
 
-CREATE TABLE incrementaltable (
+CREATE TABLE mykeyspace.incrementaltable (
     k text,
     v int,
     primary key (k)
 );
 
-CREATE TABLE wordcounttable (
+CREATE TABLE mykeyspace.wordcounttable (
 	source text,
 	word text,
 	count int,
 	primary key(source, word)
 );
 
-CREATE TABLE multikeytable (
+CREATE TABLE mykeyspace.multikeytable (
 	k1 text,
 	k2 text,
 	v1 int,
