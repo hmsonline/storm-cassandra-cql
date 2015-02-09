@@ -133,6 +133,7 @@ In this case, the mapper maps keys and values to CQL statements:
 
 When you run this example, you will find the following counts in Cassandra:
 
+```
 cqlsh> select * from mykeyspace.wordcounttable;
 
  source | word   | count
