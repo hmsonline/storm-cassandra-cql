@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example.incremental;
+package com.hmsonline.trident.cql.example.sales;
 
 import storm.trident.operation.TridentCollector;
 import storm.trident.spout.ITridentSpout.Emitter;

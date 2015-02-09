@@ -11,6 +11,7 @@ import storm.trident.state.StateFactory;
 import backtype.storm.task.IMetricsContext;
 
 import com.hmsonline.trident.cql.CqlClientFactory;
+import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 
 @SuppressWarnings("rawtypes")
 // TODO: Is it worth subclassing from CassandraCqlStateFactory?
@@ -21,15 +22,25 @@ public class CassandraCqlIncrementalStateFactory<K, V> implements StateFactory {
     private CombinerAggregator<V> aggregator;
     private CqlIncrementMapper<K, V> mapper;
 
-    public CassandraCqlIncrementalStateFactory(CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper, CqlClientFactory clientFactory) {
+    public CassandraCqlIncrementalStateFactory(CombinerAggregator<V> aggregator, CqlIncrementMapper<K, V> mapper) {
         this.aggregator = aggregator;
         this.mapper = mapper;
+    }
+    
+    protected void setCqlClientFactory(CqlClientFactory clientFactory){
         this.clientFactory = clientFactory;
     }
 
     @Override
-    public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {
+    public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {        
+        // NOTE: Lazy instantiation because Cluster is not serializable.
+        if (clientFactory == null) {
+            clientFactory = new MapConfiguredCqlClientFactory(configuration);
+        }
+        
         LOG.debug("Creating State for partition [{}] of [{}]", new Object[]{partitionIndex, numPartitions});
         return new CassandraCqlIncrementalState<K, V>(clientFactory, aggregator, mapper, partitionIndex);
     }
+    
+    
 }

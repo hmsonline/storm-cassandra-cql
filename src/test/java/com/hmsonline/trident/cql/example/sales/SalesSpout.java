@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example.incremental;
+package com.hmsonline.trident.cql.example.sales;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;

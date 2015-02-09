@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example.incremental;
+package com.hmsonline.trident.cql.example.sales;
 
 import com.hmsonline.trident.cql.incremental.PersistedState;
 

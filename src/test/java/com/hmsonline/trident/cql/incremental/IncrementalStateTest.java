@@ -1,14 +1,13 @@
-package com.hmsonline.trident.cql;
+package com.hmsonline.trident.cql.incremental;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
-import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.KEYSPACE_NAME;
-import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.KEY_NAME;
-import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.TABLE_NAME;
+import static com.hmsonline.trident.cql.example.sales.SalesMapper.KEYSPACE_NAME;
+import static com.hmsonline.trident.cql.example.sales.SalesMapper.KEY_NAME;
+import static com.hmsonline.trident.cql.example.sales.SalesMapper.TABLE_NAME;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
@@ -20,10 +19,9 @@ import storm.trident.testing.MockTridentTuple;
 import storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.querybuilder.Delete;
-import com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper;
-import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalState;
-import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
-import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
+import com.hmsonline.trident.cql.CqlTestEnvironment;
+import com.hmsonline.trident.cql.CqlUnitClientFactory;
+import com.hmsonline.trident.cql.example.sales.SalesMapper;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.
@@ -32,14 +30,13 @@ import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater
 public class IncrementalStateTest extends CqlTestEnvironment {
     private CassandraCqlIncrementalStateFactory<String, Number> stateFactory;
     private CassandraCqlIncrementalStateUpdater<String, Number> stateUpdater;
-    private CqlClientFactory clientFactory;
     private static List<String> FIELDS = Arrays.asList("price", "state", "product");
 
     public IncrementalStateTest() {
         super();
-        SalesAnalyticsMapper mapper = new SalesAnalyticsMapper();
-        clientFactory = new CqlUnitClientFactory(new HashMap<Object, Object>(), cqlUnit);
-        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper, clientFactory);
+        SalesMapper mapper = new SalesMapper();
+        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper);
+        stateFactory.setCqlClientFactory(clientFactory);
         stateUpdater = new CassandraCqlIncrementalStateUpdater<String, Number>();
     }
 
@@ -48,7 +45,7 @@ public class IncrementalStateTest extends CqlTestEnvironment {
         deleteStatement.where(eq(KEY_NAME, "MD"));
         clientFactory.getSession().execute(deleteStatement);
     }
-
+ 
     @SuppressWarnings("unchecked")
     @Test
     public void testStateUpdates() throws Exception {

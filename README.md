@@ -1,8 +1,12 @@
 Description / Rationale
 ===================
 
-This is a new CassandraState implementation built on the CQL java driver.  For Cassandra, CQL has better support for lightweight transacations, batching, and collections.  
-Also, CQL will likely get more attention than the legacy Thrift interface.  For these reasons, we decided to create a C* state implementation built on CQL.
+This is a new CassandraState implementation built on the CQL java driver.  For Cassandra, CQL has better support for lightweight transacations, batching, and collections.  Also, CQL will likely get more attention than the legacy Thrift interface.  For these reasons, we decided to create a C* state implementation built on CQL.
+
+Storm-Cassandra-Cql provides three different state implementations:
+* CassandraCqlState : Simply maps tuples to statements with batching capabilities.
+* CassandraCqlMapState : Provides an IBackingMap implementation for use with keys/values and aggregations in Storm.
+* CassandraCqlIncrementalState : Leverages conditional updates to perform dimensional aggregations on data incrementally. (each batch constitutes an increment)
 
 Design
 ===================
@@ -22,7 +26,7 @@ cat storm-cassandra-cql/src/test/resources/schema.cql | cqlsh
 ```
 
 
-## SimpleUpdateTopology
+## SimpleUpdateTopology (CassandraCqlState)
 
 The SimpleUpdateTopology simply emits integers (0-99) and writes those to Cassandra with the current timestamp % 10.  The values are written to the table: mytable.
 
@@ -69,7 +73,7 @@ When you run the `main()` method in the SimpleUpdateTopology, you should get res
 ```
 
 
-## WordCountTopology
+## WordCountTopology (CassandraCqlMapState)
 The WordCountTopology is slightly more complex in that it uses the CassandraCqlMapState.  The map state assumes you are reading/writing keys and values.  
 The topology emits words from two different sources, and then totals the words by source and persists the count to Cassandra.
 
@@ -150,6 +154,5 @@ cqlsh> select * from mykeyspace.wordcounttable;
  spout1 |   went |    74
 ```
 
-
-
+## SalesTopology (CassandraCqlIncrementalState)
 

@@ -1,6 +1,4 @@
-package com.hmsonline.trident.cql.example.incremental;
-
-import java.util.HashMap;
+package com.hmsonline.trident.cql.example.sales;
 
 import org.cassandraunit.CassandraCQLUnit;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
@@ -16,14 +14,12 @@ import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.tuple.Fields;
 
-import com.hmsonline.trident.cql.CqlClientFactory;
-import com.hmsonline.trident.cql.CqlUnitClientFactory;
 import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
 
-public class SalesAnalyticsTopology {
-    private static final Logger LOG = LoggerFactory.getLogger(SalesAnalyticsTopology.class);
+public class SalesTopology {
+    private static final Logger LOG = LoggerFactory.getLogger(SalesTopology.class);
     @Rule
     public static CassandraCQLUnit cqlUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("schema.cql","mykeyspace"));
 
@@ -32,10 +28,9 @@ public class SalesAnalyticsTopology {
         TridentTopology topology = new TridentTopology();
         SalesSpout spout = new SalesSpout();
         Stream inputStream = topology.newStream("sales", spout);
-        SalesAnalyticsMapper mapper = new SalesAnalyticsMapper();
-        CqlClientFactory clientFactory = new CqlUnitClientFactory(new HashMap<Object, Object>(), cqlUnit);
+        SalesMapper mapper = new SalesMapper();
         inputStream.partitionPersist(
-                new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper, clientFactory),
+                new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper),
                 new Fields("price", "state", "product"),
                 new CassandraCqlIncrementalStateUpdater<String, Number>());
         return topology.build();
