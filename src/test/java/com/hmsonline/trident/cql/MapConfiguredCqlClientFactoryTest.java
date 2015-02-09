@@ -45,16 +45,13 @@ public class MapConfiguredCqlClientFactoryTest extends CqlClientFactoryTestConst
         Assert.assertEquals(ProtocolOptions.Compression.NONE, clusterBuilder.getConfiguration().getProtocolOptions().getCompression());
     }
 
-    @Test(expected = IllegalStateException.class)
-    @Ignore
+    @Test
     public void testCompression() {
         final Map<Object, Object> configuration = new HashMap<Object,Object>();
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, HOSTS);
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_COMPRESSION, COMPRESSION.name());
         final CqlClientFactory factory =
                 new MapConfiguredCqlClientFactory(configuration);
-        factory.getClusterBuilder().getConfiguration().getProtocolOptions().getCompression();
-        // We're testing for the exception here since we don't have LZ4 on our classpath.
-        // Assert.assertEquals(COMPRESSION, clusterBuilder.getConfiguration().getProtocolOptions().getCompression());
+        Assert.assertEquals(COMPRESSION, factory.getCluster().getConfiguration().getProtocolOptions().getCompression());
     }
 }
