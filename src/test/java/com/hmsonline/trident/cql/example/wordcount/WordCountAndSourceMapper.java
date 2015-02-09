@@ -25,8 +25,8 @@ public class WordCountAndSourceMapper implements CqlRowMapper<List<String>, Numb
     @Override
     public Statement map(List<String> keys, Number value) {
         Insert statement = QueryBuilder.insertInto(KEYSPACE_NAME, TABLE_NAME);
-        statement.value(SOURCE_KEY_NAME, keys.get(0));
-        statement.value(WORD_KEY_NAME, keys.get(1));
+        statement.value(WORD_KEY_NAME, keys.get(0));
+        statement.value(SOURCE_KEY_NAME, keys.get(1));
         statement.value(VALUE_NAME, value);
         return statement;
     }
