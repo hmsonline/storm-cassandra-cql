@@ -31,8 +31,8 @@ public class WordCountTopology {
         FixedBatchSpout spout1 = new FixedBatchSpout(new Fields("sentence", "source"), 3,
                 new Values("the cow jumped over the moon", source1),
                 new Values("the man went to the store and bought some candy", source1),
-                new Values("four score and seven years ago", source2),
-                new Values("how many apples can you eat", source2));
+                new Values("four score and four years ago", source2),
+                new Values("how much wood can a wood chuck chuck", source2));
         spout1.setCycle(true);
 
         TridentState wordCounts =
