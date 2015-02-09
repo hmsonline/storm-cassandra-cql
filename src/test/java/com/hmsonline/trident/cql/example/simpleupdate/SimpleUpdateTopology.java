@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example.simple;
+package com.hmsonline.trident.cql.example.simpleupdate;
 
 import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 
@@ -16,16 +16,16 @@ import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlStateFactory;
 import com.hmsonline.trident.cql.CassandraCqlStateUpdater;
 
-public class ExampleTopology {
-    private static final Logger LOG = LoggerFactory.getLogger(ExampleTopology.class);
+public class SimpleUpdateTopology {
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleUpdateTopology.class);
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static StormTopology buildTopology() {
         LOG.info("Building topology.");
         TridentTopology topology = new TridentTopology();
-        ExampleSpout spout = new ExampleSpout();
+        SimpleUpdateSpout spout = new SimpleUpdateSpout();
         Stream inputStream = topology.newStream("test", spout);
-        ExampleMapper mapper = new ExampleMapper();
+        SimpleUpdateMapper mapper = new SimpleUpdateMapper();
         inputStream.partitionPersist(new CassandraCqlStateFactory(ConsistencyLevel.ONE), new Fields("test"), new CassandraCqlStateUpdater(mapper));
         return topology.build();
     }

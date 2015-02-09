@@ -4,7 +4,7 @@ import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Fields;
 
-import com.hmsonline.trident.cql.example.simple.DefaultCoordinator;
+import com.hmsonline.trident.cql.example.simpleupdate.DefaultCoordinator;
 
 import storm.trident.spout.ITridentSpout;
 

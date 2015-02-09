@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example.simple;
+package com.hmsonline.trident.cql.example.simpleupdate;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.set;
@@ -13,7 +13,7 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Update;
 import com.hmsonline.trident.cql.mappers.CqlRowMapper;
 
-public class ExampleMapper implements CqlRowMapper<Object, Object>, Serializable {
+public class SimpleUpdateMapper implements CqlRowMapper<Object, Object>, Serializable {
     private static final long serialVersionUID = 1L;
 
     public Statement map(TridentTuple tuple) {

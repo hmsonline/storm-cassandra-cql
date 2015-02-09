@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example.simple;
+package com.hmsonline.trident.cql.example.simpleupdate;
 
 import storm.trident.operation.TridentCollector;
 import storm.trident.spout.ITridentSpout.Emitter;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ExampleEmitter implements Emitter<Long>, Serializable {
+public class SimpleUpdateEmitter implements Emitter<Long>, Serializable {
     private static final long serialVersionUID = 1L;
     public static AtomicInteger successfulTransactions = new AtomicInteger(0);
     public static AtomicInteger uids = new AtomicInteger(0);
