@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.cassandraunit.CassandraCQLUnit;
 import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.slf4j.Logger;
@@ -48,6 +49,12 @@ public class CqlTestEnvironment {
         if (cqlUnit == null){
             cqlUnit = new CassandraCQLUnit(new ClassPathCQLDataSet("schema.cql","mykeyspace"));            
         }
+    }
+
+    @After
+    public void tearDown() throws InterruptedException{        
+        LOG.debug("Tearing Down.");
+        cqlUnit.cluster.close();
     }
     
     public void assertValue(String k, Integer expectedValue) {

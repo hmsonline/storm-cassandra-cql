@@ -36,7 +36,7 @@ public abstract class CqlClientFactory implements Serializable {
         return defaultSession;
     }
 
-    public Cluster getCluster() {
+    protected Cluster getCluster() {
         if (cluster == null || cluster.isClosed()) {
             if (cluster != null && cluster.isClosed()){
                 LOG.warn("Cluster closed, reconstructing cluster for [{}]", cluster.getClusterName());
