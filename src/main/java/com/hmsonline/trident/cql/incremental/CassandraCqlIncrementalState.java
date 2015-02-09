@@ -94,11 +94,7 @@ public class CassandraCqlIncrementalState<K, V> implements State {
         Statement readStatement = mapper.read(entry.getKey());
         LOG.debug("EXECUTING [{}]", readStatement.toString());
 
-        if(aggregateValues.keySet().size() > 1) {
-            LOG.debug("WARNING size is [{}], which could make this fail.", aggregateValues.keySet().size());
-        }
         ResultSet results = clientFactory.getSession().execute(readStatement);
-
         List<Row> rows = results.all();
         PersistedState<V> persistedState = mapper.currentState(entry.getKey(), rows);
         LOG.debug("Persisted value = [{}]", persistedState.getValue());
