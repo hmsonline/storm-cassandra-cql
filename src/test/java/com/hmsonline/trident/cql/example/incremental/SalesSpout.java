@@ -1,18 +1,21 @@
-package com.hmsonline.trident.cql.example;
+package com.hmsonline.trident.cql.example.incremental;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.tuple.Fields;
+
+import com.hmsonline.trident.cql.example.simple.DefaultCoordinator;
+
 import storm.trident.spout.ITridentSpout;
 
 import java.util.Map;
 
 @SuppressWarnings("rawtypes")
-public class ExampleSpout implements ITridentSpout<Long> {
+public class SalesSpout implements ITridentSpout<Long> {
     private static final long serialVersionUID = 1L;
     SpoutOutputCollector collector;
     BatchCoordinator<Long> coordinator = new DefaultCoordinator();
-    Emitter<Long> emitter = new ExampleEmitter();
+    Emitter<Long> emitter = new SalesEmitter();
 
     @Override
     public BatchCoordinator<Long> getCoordinator(String txStateId, Map conf, TopologyContext context) {
@@ -31,6 +34,6 @@ public class ExampleSpout implements ITridentSpout<Long> {
 
     @Override
     public Fields getOutputFields() {
-        return new Fields("test");
+        return new Fields("state", "product", "price");
     }
 }

@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example;
+package com.hmsonline.trident.cql.example.simple;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

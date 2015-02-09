@@ -2,9 +2,9 @@ package com.hmsonline.trident.cql;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEYSPACE_NAME;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEY_NAME;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.TABLE_NAME;
+import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.KEYSPACE_NAME;
+import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.KEY_NAME;
+import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.TABLE_NAME;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,10 +20,10 @@ import storm.trident.testing.MockTridentTuple;
 import storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.querybuilder.Delete;
+import com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalState;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateFactory;
 import com.hmsonline.trident.cql.incremental.CassandraCqlIncrementalStateUpdater;
-import com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.

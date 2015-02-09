@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.incremental.example;
+package com.hmsonline.trident.cql.example.incremental;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;

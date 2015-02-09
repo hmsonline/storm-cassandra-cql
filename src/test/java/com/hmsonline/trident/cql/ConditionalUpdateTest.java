@@ -3,10 +3,10 @@ package com.hmsonline.trident.cql;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.set;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.update;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEYSPACE_NAME;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.KEY_NAME;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.TABLE_NAME;
-import static com.hmsonline.trident.cql.incremental.example.SalesAnalyticsMapper.VALUE_NAME;
+import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.KEYSPACE_NAME;
+import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.KEY_NAME;
+import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.TABLE_NAME;
+import static com.hmsonline.trident.cql.example.incremental.SalesAnalyticsMapper.VALUE_NAME;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

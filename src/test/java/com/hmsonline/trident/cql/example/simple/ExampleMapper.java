@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example;
+package com.hmsonline.trident.cql.example.simple;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.set;

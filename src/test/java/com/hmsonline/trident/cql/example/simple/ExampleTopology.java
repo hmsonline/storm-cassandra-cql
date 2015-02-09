@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.example;
+package com.hmsonline.trident.cql.example.simple;
 
 import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 
