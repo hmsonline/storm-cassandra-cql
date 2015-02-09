@@ -70,11 +70,16 @@ When you run the `main()` method in the SimpleUpdateTopology, you should get res
 
 
 ## WordCountTopology
-The first example is a WordCount example.  This uses the CassandraCqlMapState, which writes/reads keys and values to/from Cassandra.
+The WordCountTopology is slightly more complex in that it uses the CassandraCqlMapState.  The map state assumes you are reading/writing keys and values.  
+The topology emits words from two different sources, and then totals the words by source and persists the count to Cassandra.
+
+The CassandraCqlMapState object implements the IBackingMap interface in Storm.
+See:
+[Blog on the use of IBackingMap](https://svendvanderveken.wordpress.com/2013/07/30/scalable-real-time-state-update-with-storm/)
 
 Have a look at the [WordCountTopology](https://github.com/hmsonline/storm-cassandra-cql/blob/master/src/test/java/com/hmsonline/trident/cql/example/wordcount/WordCountTopology.java).
 
-It uses a FixedBatchSpout to emit sentences over and over again:
+It uses a FixedBatchSpout that emits sentences over and over again:
 
 ```java
    FixedBatchSpout spout1 = new FixedBatchSpout(new Fields("sentence"), 3,
@@ -97,8 +102,52 @@ TridentState wordCounts =
                         .parallelismHint(6);
 ```
 
-Notice that an instance of WordCountMapper is passed into the CassandraCqlMapState.
+Instead of a partitionPersist like the other topology, this topology aggregates first, using the persistentAggregate method.  This performs an aggregation, storing the results in the CassandraCqlMapState, on which Storm eventually calls multiPut/multiGet to store/read values.
 
+See:
+[CassandraCqlMapState.multiPut/Get](https://github.com/hmsonline/storm-cassandra-cql/blob/master/src/main/java/com/hmsonline/trident/cql/CassandraCqlMapState.java#L122-L187)
+
+In this case, the mapper maps keys and values to CQL statements:
+
+```java
+    @Override
+    public Statement map(List<String> keys, Number value) {
+        Insert statement = QueryBuilder.insertInto(KEYSPACE_NAME, TABLE_NAME);
+        statement.value(WORD_KEY_NAME, keys.get(0));
+        statement.value(SOURCE_KEY_NAME, keys.get(1));
+        statement.value(VALUE_NAME, value);
+        return statement;
+    }
+
+    @Override
+    public Statement retrieve(List<String> keys) {
+        // Retrieve all the columns associated with the keys
+        Select statement = QueryBuilder.select().column(SOURCE_KEY_NAME)
+                .column(WORD_KEY_NAME).column(VALUE_NAME)
+                .from(KEYSPACE_NAME, TABLE_NAME);
+        statement.where(QueryBuilder.eq(SOURCE_KEY_NAME, keys.get(0)));
+        statement.where(QueryBuilder.eq(WORD_KEY_NAME, keys.get(1)));
+        return statement;
+    }
+```
+
+When you run this example, you will find the following counts in Cassandra:
+
+cqlsh> select * from mykeyspace.wordcounttable;
+
+ source | word   | count
+--------+--------+-------
+ spout2 |      a |    73
+ spout2 |    ago |    74
+ spout2 |    and |    74
+ spout2 | apples |    69
+...
+ spout1 |   some |    74
+ spout1 |  store |    74
+ spout1 |    the |   296
+ spout1 |     to |    74
+ spout1 |   went |    74
+```
 
 
 
