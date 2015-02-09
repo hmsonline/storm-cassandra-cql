@@ -6,10 +6,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.cassandraunit.CassandraCQLUnit;
-import org.cassandraunit.dataset.cql.ClassPathCQLDataSet;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 import com.datastax.driver.core.Cluster;

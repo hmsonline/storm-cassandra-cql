@@ -31,6 +31,7 @@ public class CassandraCqlIncrementalStateFactory<K, V> implements StateFactory {
         this.clientFactory = clientFactory;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {        
         // NOTE: Lazy instantiation because Cluster is not serializable.

@@ -20,7 +20,6 @@ import storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.querybuilder.Delete;
 import com.hmsonline.trident.cql.CqlTestEnvironment;
-import com.hmsonline.trident.cql.CqlUnitClientFactory;
 import com.hmsonline.trident.cql.example.sales.SalesMapper;
 
 /**
@@ -64,6 +63,7 @@ public class IncrementalStateTest extends CqlTestEnvironment {
         assertValue("MD", 200);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testValueAggregations() {
         clearState();
