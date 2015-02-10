@@ -85,6 +85,11 @@
 			<artifactId>guava</artifactId>
 			<version>16.0.1</version>
 		</dependency>
+                <dependency>
+                    <groupId>net.jpountz.lz4</groupId>
+                    <artifactId>lz4</artifactId>
+                    <version>1.2.0</version>
+                </dependency>
 	</dependencies>
 	<build>
 
