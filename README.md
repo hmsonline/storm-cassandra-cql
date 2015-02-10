@@ -43,7 +43,7 @@ See:
 * [CassandraCqlStateUpdater.updateState](https://github.com/hmsonline/storm-cassandra-cql/blob/master/src/main/java/com/hmsonline/trident/cql/CassandraCqlStateUpdater.java#L37-L41)
 * [CassandraCqlState.commit](https://github.com/hmsonline/storm-cassandra-cql/blob/master/src/main/java/com/hmsonline/trident/cql/CassandraCqlState.java#L39-L56)
 
-The SimpleUpdateMapper looksl like this:
+The SimpleUpdateMapper looks like this:
 
 ```java
 public class SimpleUpdateMapper implements CqlRowMapper<Object, Object>, Serializable {
@@ -213,5 +213,12 @@ Notice that the constructor for the state factory takes an aggregation, along wi
 ```
 
 Notice the update statement includes a condition.  Also notice that the mapper provides a way to retrieve the relevant key and value from the tuple.  These methods are used by the updater to get the key and value to incorporate into the aggregation.
+
+Configuration
+===================
+You will likely need to configure various properties of the CQL client/cluster.  To do that, you use the MapConfiguredCqlClientFactory.  Populate a map with the configuration parameters.  Storm then passes that configuration along to the StateFactory, which uses that configuration to construct the client factory.  You can set things like read timeouts, etc.
+
+For an example, take a look at:
+[MapConfiguredCqlClientFactory](https://github.com/hmsonline/storm-cassandra-cql/blob/master/src/test/java/com/hmsonline/trident/cql/MapConfiguredCqlClientFactoryTest.java#L16-L24)
 
 

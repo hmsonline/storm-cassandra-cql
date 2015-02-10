@@ -1,12 +1,11 @@
 package com.hmsonline.trident.cql.example.simpleupdate;
 
-import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import storm.trident.Stream;
 import storm.trident.TridentTopology;
+import storm.trident.operation.builtin.Debug;
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.generated.StormTopology;
@@ -15,6 +14,7 @@ import backtype.storm.tuple.Fields;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlStateFactory;
 import com.hmsonline.trident.cql.CassandraCqlStateUpdater;
+import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;
 
 public class SimpleUpdateTopology {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleUpdateTopology.class);
@@ -27,6 +27,7 @@ public class SimpleUpdateTopology {
         Stream inputStream = topology.newStream("test", spout);
         SimpleUpdateMapper mapper = new SimpleUpdateMapper();
         inputStream.partitionPersist(new CassandraCqlStateFactory(ConsistencyLevel.ONE), new Fields("test"), new CassandraCqlStateUpdater(mapper));
+        // inputStream.each(new Fields("test"), new Debug());
         return topology.build();
     }
 
