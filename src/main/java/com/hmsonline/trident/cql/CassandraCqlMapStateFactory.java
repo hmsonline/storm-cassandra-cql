@@ -2,6 +2,7 @@ package com.hmsonline.trident.cql;
 
 import java.util.Map;
 
+import com.datastax.driver.core.Session;
 import storm.trident.state.State;
 import storm.trident.state.StateFactory;
 import storm.trident.state.StateType;
@@ -47,7 +48,14 @@ public class CassandraCqlMapStateFactory implements StateFactory {
             clientFactory = new MapConfiguredCqlClientFactory(configuration);
         }
 
-        CassandraCqlMapState state = new CassandraCqlMapState(clientFactory.getSession(options.keyspace), mapper, options, configuration);
+        Session session;
+        if(options.keyspace != null) {
+            session = clientFactory.getSession(options.keyspace);
+        } else {
+            session = clientFactory.getSession();
+        }
+
+        CassandraCqlMapState state = new CassandraCqlMapState(session, mapper, options, configuration);
         state.registerMetrics(configuration, metrics);
 
         CachedMap cachedMap = new CachedMap(state, options.localCacheSize);
