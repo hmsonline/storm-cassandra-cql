@@ -1,9 +1,9 @@
 ## 0.3.0
 
-* [#31]: Added ability to configure read timeouts, and various other parameters on the CQL cluster/session.
-* [#47]: Added LZ4 dependency, so it gets bundled in.
-* [#37]: Fixed leaking statements inside State object.
-* [#36]: Fixed issue with incrmental state only commiting one aggregate value.
+* [#31][]: Added ability to configure read timeouts, and various other parameters on the CQL cluster/session.
+* [#47][]: Added LZ4 dependency, so it gets bundled in.
+* [#37][]: Fixed leaking statements inside State object.
+* [#36][]: Fixed issue with incrmental state only commiting one aggregate value.
 * Added cassandra-unit to the test suite so we could un-Ignore tests.
 * Repackaged tests and added documentation to make them more understantable.
 
