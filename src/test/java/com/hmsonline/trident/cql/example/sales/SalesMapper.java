@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.incremental.example;
+package com.hmsonline.trident.cql.example.sales;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
 import static com.datastax.driver.core.querybuilder.QueryBuilder.select;
@@ -17,7 +17,7 @@ import com.datastax.driver.core.querybuilder.Update;
 import com.hmsonline.trident.cql.incremental.CqlIncrementMapper;
 import com.hmsonline.trident.cql.incremental.PersistedState;
 
-public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>, Serializable {
+public class SalesMapper implements CqlIncrementMapper<String, Number>, Serializable {
     private static final long serialVersionUID = 1L;
     // private static final Logger LOG =
     // LoggerFactory.getLogger(SalesAnalyticsMapper.class);
@@ -30,7 +30,7 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
 
     @Override
     public Statement read(String key) {
-        Select statement = select().column("v").from(KEYSPACE_NAME, TABLE_NAME);
+        Select statement = select().column(VALUE_NAME).from(KEYSPACE_NAME, TABLE_NAME);
         statement.where(eq(KEY_NAME, key));
         return statement;
     }
@@ -47,7 +47,11 @@ public class SalesAnalyticsMapper implements CqlIncrementMapper<String, Number>,
 
     @Override
     public SalesState currentState(String key, List<Row> rows) {
-        return new SalesState(rows.get(0).getInt(VALUE_NAME),rows.get(0).getString("partitions"));
+        if (rows.size() == 0) {
+            return new SalesState(null, null);
+        } else {
+            return new SalesState(rows.get(0).getInt(VALUE_NAME), "");
+        }
     }
 
     @Override

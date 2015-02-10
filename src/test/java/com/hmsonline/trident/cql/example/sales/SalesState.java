@@ -1,4 +1,4 @@
-package com.hmsonline.trident.cql.incremental.example;
+package com.hmsonline.trident.cql.example.sales;
 
 import com.hmsonline.trident.cql.incremental.PersistedState;
 
@@ -7,7 +7,7 @@ public class SalesState implements PersistedState<Number> {
     String partitionsKey;
     public SalesState(Number value,String partitionsKey){
         this.value = value;
-        this.partitionsKey=partitionsKey;
+        this.partitionsKey = partitionsKey;
     }
     
     @Override

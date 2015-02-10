@@ -14,7 +14,6 @@ import storm.trident.state.map.TransactionalMap;
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
 
-import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlMapState.Options;
 import com.hmsonline.trident.cql.mappers.CqlRowMapper;
 
@@ -30,26 +29,22 @@ public class CassandraCqlMapStateFactory implements StateFactory {
     private CqlClientFactory clientFactory;
     private StateType stateType;
     private Options<?> options;
-    private ConsistencyLevel batchConsistencyLevel;
 
     @SuppressWarnings("rawtypes")
     private CqlRowMapper mapper;
 
     @SuppressWarnings({"rawtypes"})
-    public CassandraCqlMapStateFactory(CqlRowMapper mapper, StateType stateType, Options options, 
-            ConsistencyLevel batchConsistencyLevel) {
+    public CassandraCqlMapStateFactory(CqlRowMapper mapper, StateType stateType, Options options) {
         this.stateType = stateType;
         this.options = options;
         this.mapper = mapper;
-        this.batchConsistencyLevel = batchConsistencyLevel;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public State makeState(Map configuration, IMetricsContext metrics, int partitionIndex, int numPartitions) {
 
         if (clientFactory == null) {
-            String hosts = (String) configuration.get(CassandraCqlStateFactory.TRIDENT_CASSANDRA_CQL_HOSTS);
-            clientFactory = new CqlClientFactory(hosts, batchConsistencyLevel);
+            clientFactory = new MapConfiguredCqlClientFactory(configuration);
         }
 
         CassandraCqlMapState state = new CassandraCqlMapState(clientFactory.getSession(options.keyspace), mapper, options, configuration);
@@ -70,5 +65,4 @@ public class CassandraCqlMapStateFactory implements StateFactory {
 
         return new SnapshottableMap(mapState, new Values(options.globalKey));
     }
-
 }
