@@ -13,6 +13,8 @@ Design
 An application/topology provides implementations of the mapper interfaces. 
 For example, the [CqlRowMapper](https://github.com/hmsonline/storm-cassandra-cql/blob/master/src/main/java/com/hmsonline/trident/cql/mappers/CqlRowMapper.java) provides a bidirectional mapping from Keys and Values to statements that can be used to upsert and retrieve data.
 
+The mappers are used to translate between Storm constructs and CQL constructs.  Storm uses the state factories to create state objects.  Updaters then use the mappers to update the state objects.  State is then committed on a per batch basis.
+
 Getting Started
 ===================
 You can use the examples to get started.  For the example, you'll want to run a local cassandra instance with the example schema found in 
