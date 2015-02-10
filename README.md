@@ -155,4 +155,61 @@ cqlsh> select * from mykeyspace.wordcounttable;
 ```
 
 ## SalesTopology (CassandraCqlIncrementalState)
+The SalesTopology demonstrates the use of Cassandra for incremental data aggregation.  The emitter/spout simulates sales of products across states.  It emits three fields: state, product and price.  The state object incorporates an aggregator, and aggregates values as tuples are processed.  It then flushes the aggregate values to Cassandra, by first reading the current value, incorporating the new value, and then writing the new value using a conditional update.
+
+
+Here is the topolgy:
+
+```java
+   Stream inputStream = topology.newStream("sales", spout);
+   SalesMapper mapper = new SalesMapper();
+   inputStream.partitionPersist(
+      new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper),
+      new Fields("price", "state", "product"),
+      new CassandraCqlIncrementalStateUpdater<String, Number>());
+```
+
+Notice that the constructor for the state factory takes an aggregation, along with the mapper.  As the updater processes the tuples, the aggregator is used to maintain aggregate values based on the keys. The updater users a standard mapper.  For this example, the mapper is as follows:
+
+```java
+    @Override
+    public Statement read(String key) {
+        Select statement = select().column(VALUE_NAME).from(KEYSPACE_NAME, TABLE_NAME);
+        statement.where(eq(KEY_NAME, key));
+        return statement;
+    }
+
+    @Override
+    public Statement update(String key, Number value, PersistedState<Number> state, long txid, int partition) {
+        Update update = QueryBuilder.update(KEYSPACE_NAME, TABLE_NAME);
+        update.with(set(VALUE_NAME, value)).where(eq(KEY_NAME, key));
+        if (state.getValue() != null) {
+            update.onlyIf(eq(VALUE_NAME, state.getValue()));
+        }
+        return update;
+    }
+
+    @Override
+    public SalesState currentState(String key, List<Row> rows) {
+        if (rows.size() == 0) {
+            return new SalesState(null, null);
+        } else {
+            return new SalesState(rows.get(0).getInt(VALUE_NAME), "");
+        }
+    }
+
+    @Override
+    public String getKey(TridentTuple tuple) {
+        String state = tuple.getString(1);
+        return state;
+    }
+
+    @Override
+    public Number getValue(TridentTuple tuple) {
+        return tuple.getInteger(0);
+    }
+```
+
+Notice the update statement includes a condition.  Also notice that the mapper provides a way to retrieve the relevant key and value from the tuple.  These methods are used by the updater to get the key and value to incorporate into the aggregation.
+
 
