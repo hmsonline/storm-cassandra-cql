@@ -7,6 +7,11 @@
 * Added cassandra-unit to the test suite so we could un-Ignore tests.
 * Repackaged tests and added documentation to make them more understantable.
 
+[#31]: https://github.com/hmsonline/storm-cassandra-cql/issues/31
+[#36]: https://github.com/hmsonline/storm-cassandra-cql/issues/36
+[#37]: https://github.com/hmsonline/storm-cassandra-cql/issues/37
+[#47]: https://github.com/hmsonline/storm-cassandra-cql/issues/47
+
 ## 0.2.4
 
 * Bump cassandra-driver-core dependency to 2.1.4
@@ -22,3 +27,4 @@
 [#22]: https://github.com/hmsonline/storm-cassandra-cql/issues/22
 [#26]: https://github.com/hmsonline/storm-cassandra-cql/issues/26
 [#27]: https://github.com/hmsonline/storm-cassandra-cql/issues/27
+
