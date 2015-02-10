@@ -9,4 +9,7 @@
 .classpath
 .project
 .settings/
-/target/
+
+# IDE Files #
+*.iml
+.idea

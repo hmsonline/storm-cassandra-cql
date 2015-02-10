@@ -55,9 +55,10 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     public static class Options<T> implements Serializable {
         public int localCacheSize = 5000;
         public String globalKey = "globalkey";
-        public String keyspace = "mykeyspace";
-        public String tableName = "mytable";
+        public String keyspace;
+        public String tableName;
         public Integer ttl = 86400; // 1 day
+        public Type batchType = Type.LOGGED;
     }
 
     /////////////////////////////////////////////
@@ -106,6 +107,8 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     @SuppressWarnings("rawtypes")
     private CqlRowMapper mapper;
 
+    private Type batchType;
+
     // Metrics for storm metrics registering
     CountMetric _mreads;
     CountMetric _mwrites;
@@ -114,6 +117,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     @SuppressWarnings({"rawtypes"})
     public CassandraCqlMapState(Session session, CqlRowMapper mapper, Options<T> options, Map conf) {
         //this.options = options;
+        this.batchType = options.batchType;
         this.session = session;
         this.mapper = mapper;
     }
@@ -174,7 +178,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
             }
 
             // Execute all the statements as a batch.
-            BatchStatement batch = new BatchStatement(Type.LOGGED);
+            BatchStatement batch = new BatchStatement(batchType);
             batch.addAll(statements);
             session.execute(batch);
 

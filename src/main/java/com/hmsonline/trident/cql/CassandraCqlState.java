@@ -19,6 +19,8 @@ public class CassandraCqlState implements State {
     private CqlClientFactory clientFactory;
     private int maxBatchSize;
     private ConsistencyLevel batchConsistencyLevel;
+    private Type batchType = Type.LOGGED;
+
     List<Statement> statements = new ArrayList<Statement>();
     
     public CassandraCqlState(CqlClientFactory clientFactory, ConsistencyLevel batchConsistencyLevel) {
@@ -38,7 +40,7 @@ public class CassandraCqlState implements State {
     @Override
     public void commit(Long txid) {
         LOG.debug("Commiting [{}]", txid);
-        BatchStatement batch = new BatchStatement(Type.LOGGED);
+        BatchStatement batch = new BatchStatement(batchType);
         batch.setConsistencyLevel(batchConsistencyLevel);
         int i = 0;
         for(Statement statement : this.statements) {
@@ -46,7 +48,7 @@ public class CassandraCqlState implements State {
             i++;
             if(i >= this.maxBatchSize) {
                 clientFactory.getSession().execute(batch);
-                batch = new BatchStatement(Type.LOGGED);
+                batch = new BatchStatement(batchType);
                 i = 0;
             }
         }
