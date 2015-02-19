@@ -27,12 +27,12 @@ import com.hmsonline.trident.cql.mappers.CqlRowMapper;
 public class CassandraCqlMapStateFactory implements StateFactory {
     private static final long serialVersionUID = 1L;
 
-	protected CqlClientFactory clientFactory;
-	protected StateType stateType;
-	protected Options<?> options;
+    private CqlClientFactory clientFactory;
+    private StateType stateType;
+    private Options<?> options;
 
     @SuppressWarnings("rawtypes")
-	protected CqlRowMapper mapper;
+    private CqlRowMapper mapper;
 
     @SuppressWarnings({"rawtypes"})
     public CassandraCqlMapStateFactory(CqlRowMapper mapper, StateType stateType, Options options) {

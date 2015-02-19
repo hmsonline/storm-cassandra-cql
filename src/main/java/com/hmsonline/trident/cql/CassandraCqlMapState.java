@@ -104,12 +104,12 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     // Instance Variables
     //////////////////////////////
     // private Options<T> options;
-    protected final Session session;
+    private final Session session;
 
     @SuppressWarnings("rawtypes")
-	protected CqlRowMapper mapper;
+    private CqlRowMapper mapper;
 
-	protected Type batchType;
+    private Type batchType;
 
     // Metrics for storm metrics registering
     CountMetric _mreads;
@@ -191,7 +191,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
         }
     }
 
-	protected void checkCassandraException(Exception e) {
+    private void checkCassandraException(Exception e) {
         _mexceptions.incr();
         if (e instanceof AlreadyExistsException ||
                 e instanceof AuthenticationException ||
