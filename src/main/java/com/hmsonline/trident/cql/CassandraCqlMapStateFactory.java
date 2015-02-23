@@ -56,7 +56,7 @@ public class CassandraCqlMapStateFactory implements StateFactory {
         }
 
         CassandraCqlMapState state = new CassandraCqlMapState(session, mapper, options, configuration);
-        state.registerMetrics(configuration, metrics);
+        state.registerMetrics(configuration, metrics, options.mapStateMetricName);
 
         CachedMap cachedMap = new CachedMap(state, options.localCacheSize);
 

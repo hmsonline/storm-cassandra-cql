@@ -59,6 +59,8 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
         public String tableName;
         public Integer ttl = 86400; // 1 day
         public Type batchType = Type.LOGGED;
+		// Unique name of storm metrics. Must ne unique in topology
+		public String mapStateMetricName = this.toString();
     }
 
     /////////////////////////////////////////////
@@ -216,10 +218,11 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     }
 
     @SuppressWarnings("rawtypes")
-    public void registerMetrics(Map conf, IMetricsContext context) {
+    public void registerMetrics(Map conf, IMetricsContext context, String mapStateMetricName) {
         int bucketSize = (Integer) (conf.get(Config.TOPOLOGY_BUILTIN_METRICS_BUCKET_SIZE_SECS));
-        _mreads = context.registerMetric("cassandra/readCount", new CountMetric(), bucketSize);
-        _mwrites = context.registerMetric("cassandra/writeCount", new CountMetric(), bucketSize);
-        _mexceptions = context.registerMetric("cassandra/exceptionCount", new CountMetric(), bucketSize);
+        String metricBaseName = "cassandra/" + mapStateMetricName;
+		_mreads = context.registerMetric(metricBaseName + "/readCount", new CountMetric(), bucketSize);
+        _mwrites = context.registerMetric(metricBaseName + "/writeCount", new CountMetric(), bucketSize);
+        _mexceptions = context.registerMetric(metricBaseName + "/exceptionCount", new CountMetric(), bucketSize);
     }
 }
