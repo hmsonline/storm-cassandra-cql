@@ -18,10 +18,16 @@ public class CassandraCqlStateUpdater<K,V> implements StateUpdater<CassandraCqlS
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(CassandraCqlStateUpdater.class);
     private CqlTupleMapper<K,V> mapper = null;
+	private boolean propagateTuples;
 
     public CassandraCqlStateUpdater(CqlTupleMapper<K,V> mapper) {
-        this.mapper = mapper;
+        this(mapper, false);
     }
+
+	public CassandraCqlStateUpdater(CqlTupleMapper<K,V> mapper, boolean propagateTuples) {
+        this.mapper = mapper;
+		this.propagateTuples = propagateTuples;
+	}
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -38,6 +44,9 @@ public class CassandraCqlStateUpdater<K,V> implements StateUpdater<CassandraCqlS
         for (TridentTuple tuple : tuples) {
             Statement statement = this.mapper.map(tuple);
             state.addStatement(statement);
+			if (propagateTuples) {
+				collector.emit(tuple);
+			}
         }
     }
 }
