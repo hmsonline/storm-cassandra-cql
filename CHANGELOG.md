@@ -1,3 +1,9 @@
+## 0.3.1
+
+* [#51][]: Bump cassandra-driver-core dependency to 2.1.6
+
+[#51]: https://github.com/hmsonline/storm-cassandra-cql/issues/51
+
 ## 0.3.0
 
 * [#31][]: Added ability to configure read timeouts, and various other parameters on the CQL cluster/session.
