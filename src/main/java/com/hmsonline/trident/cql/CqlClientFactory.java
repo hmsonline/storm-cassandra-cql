@@ -13,29 +13,42 @@ public abstract class CqlClientFactory implements Serializable {
 
     private static final long serialVersionUID = 2L;
     private static final Logger LOG = LoggerFactory.getLogger(CqlClientFactory.class);
-    private Map<String, Session> sessions = new HashMap<String, Session>();
+    private Map<String, Session> sessions = new HashMap<>();
     private Session defaultSession = null;
     private Cluster cluster = null;
 
     abstract Cluster.Builder getClusterBuilder();
 
-    public synchronized Session getSession(String keyspace) {
+    public Session getSession(String keyspace) {
         Session session = sessions.get(keyspace);
         if (session == null) {
             LOG.debug("Constructing session for keyspace [" + keyspace + "]");
+            session = initializeSession(keyspace);
+        }
+        return session;
+    }
+
+    public Session getSession() {
+        if (defaultSession == null) {
+            defaultSession = initializeSession();
+        }
+        return defaultSession;
+    }
+
+    private synchronized Session initializeSession() {
+            if (defaultSession == null) {
+                defaultSession = getCluster().connect();
+            }
+            return defaultSession;
+    }
+    private synchronized Session initializeSession(String keyspace) {
+        Session session = sessions.get(keyspace);
+        if (session==null) {
             session = getCluster().connect(keyspace);
             sessions.put(keyspace, session);
         }
         return session;
     }
-
-    public synchronized Session getSession() {
-        if (defaultSession == null) {
-            defaultSession = getCluster().connect();
-        }
-        return defaultSession;
-    }
-
     protected Cluster getCluster() {
         if (cluster == null || cluster.isClosed()) {
             if (cluster != null && cluster.isClosed()){
