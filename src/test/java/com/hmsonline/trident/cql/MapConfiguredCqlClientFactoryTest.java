@@ -50,4 +50,16 @@ public class MapConfiguredCqlClientFactoryTest extends CqlClientFactoryTestConst
                 new MapConfiguredCqlClientFactory(configuration);
         Assert.assertEquals(COMPRESSION, factory.getCluster().getConfiguration().getProtocolOptions().getCompression());
     }
+
+    @Test
+    public void testQueryLogger() {
+        final Map<Object, Object> configuration = new HashMap<Object,Object>();
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, HOSTS);
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_QUERY_LOGGER_CONSTANT_THRESHOLD, "5000");
+        final CqlClientFactory factory =
+                new MapConfiguredCqlClientFactory(configuration);
+        factory.getCluster();
+        // Cluster doesn't let you see get to the list of registered listeners and we have no
+        // mocking framework in the pom as of now.
+    }
 }
