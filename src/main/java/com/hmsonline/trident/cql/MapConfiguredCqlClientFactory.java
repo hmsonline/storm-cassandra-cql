@@ -3,6 +3,7 @@ package com.hmsonline.trident.cql;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ProtocolOptions;
+import com.datastax.driver.core.QueryLogger;
 import com.datastax.driver.core.QueryOptions;
 import com.datastax.driver.core.SocketOptions;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
@@ -28,6 +29,7 @@ public class MapConfiguredCqlClientFactory extends CqlClientFactory {
     public static final String TRIDENT_CASSANDRA_LOCAL_DATA_CENTER_NAME = "trident.cassandra.local.data.center.name";
     public static final String TRIDENT_CASSANDRA_CONSISTENCY = "trident.cassandra.consistency";
     public static final String TRIDENT_CASSANDRA_SERIAL_CONSISTENCY = "trident.cassandra.serial.consistency";
+    public static final String TRIDENT_CASSANDRA_QUERY_LOGGER_CONSTANT_THRESHOLD = "trident.cassandra.query.logger.constant.threshold";
 
     final Map<Object,Object> configuration;
 
@@ -118,6 +120,18 @@ public class MapConfiguredCqlClientFactory extends CqlClientFactory {
         configureCompression();
         configureLoadBalancingPolicy();
         configureOther();
+    }
+
+    @Override
+    protected void prepareCluster(final Cluster cluster) {
+        super.prepareCluster(cluster);
+        final String threshold = (String) configuration.get(TRIDENT_CASSANDRA_QUERY_LOGGER_CONSTANT_THRESHOLD);
+        if (StringUtils.isNotEmpty(threshold)) {
+            final QueryLogger logger = QueryLogger.builder(cluster)
+                    .withConstantThreshold(Long.parseLong(threshold))
+                    .build();
+            cluster.register(logger);
+        }
     }
 
     public Cluster.Builder getClusterBuilder() {

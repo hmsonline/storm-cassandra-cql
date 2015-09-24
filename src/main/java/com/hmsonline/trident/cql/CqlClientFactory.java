@@ -17,7 +17,21 @@ public abstract class CqlClientFactory implements Serializable {
     private Session defaultSession = null;
     private Cluster cluster = null;
 
+    /**
+     * Subclasses must implement the creation of
+     * of the Cluster.Builder.
+     *
+     * @return
+     */
     abstract Cluster.Builder getClusterBuilder();
+
+    /**
+     * This allows subclasses to work with the cluster after it is created.
+     * For example, QueryLoggers could be registered.
+     *
+     * @param cluster
+     */
+    protected void prepareCluster(final Cluster cluster) {}
 
     public Session getSession(String keyspace) {
         Session session = sessions.get(keyspace);
@@ -59,6 +73,8 @@ public abstract class CqlClientFactory implements Serializable {
 
             if (cluster == null) {
                 throw new RuntimeException("Critical error: cluster is null after building.");
+            } else {
+                prepareCluster(cluster);
             }
         }
 
