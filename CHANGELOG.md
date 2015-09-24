@@ -1,3 +1,15 @@
+## 0.3.3
+
+* [#55][]: Add support for QueryLogger into MapConfiguredCqlClientFactory
+
+[#55]: https://github.com/hmsonline/storm-cassandra-cql/issues/55
+
+## 0.3.2
+
+* [#54][]: Reduce synchronization on CqlClientFactory
+
+[#54]: https://github.com/hmsonline/storm-cassandra-cql/issues/54
+
 ## 0.3.1
 
 * [#51][]: Bump cassandra-driver-core dependency to 2.1.6
