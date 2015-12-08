@@ -61,6 +61,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
         public Type batchType = Type.LOGGED;
 		// Unique name of storm metrics. Must ne unique in topology
 		public String mapStateMetricName = this.toString();
+		public int maxBatchSize = 100;
     }
 
     /////////////////////////////////////////////
@@ -109,7 +110,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
     @SuppressWarnings("rawtypes")
 	protected CqlRowMapper mapper;
 
-    protected Type batchType;
+    private Options<T> options;
 
     // Metrics for storm metrics registering
     CountMetric _mreads;
@@ -118,8 +119,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
 
     @SuppressWarnings({"rawtypes"})
     public CassandraCqlMapState(Session session, CqlRowMapper mapper, Options<T> options, Map conf) {
-        //this.options = options;
-        this.batchType = options.batchType;
+        this.options = options;
         this.session = session;
         this.mapper = mapper;
     }
@@ -165,7 +165,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
         LOG.debug("Putting the following keys: {} with values: {}", keys, values);
         try {
             List<Statement> statements = new ArrayList<Statement>();
-
+            
             // Retrieve the mapping statement for the key,val pair
             for (int i = 0; i < keys.size(); i++) {
                 List<Object> key = keys.get(i);
@@ -180,9 +180,20 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
             }
 
             // Execute all the statements as a batch.
-            BatchStatement batch = new BatchStatement(batchType);
-            batch.addAll(statements);
-            session.execute(batch);
+            BatchStatement batch = new BatchStatement(options.batchType);
+            int i = 0;
+            for (Statement statement : statements) {
+            	batch.add(statement);
+                i++;
+                if(i >= options.maxBatchSize) {
+                    session.execute(batch);
+                    batch = new BatchStatement(options.batchType);
+                    i = 0;
+                }
+            }
+            if (i > 0) {
+            	session.execute(batch);
+            }
 
             _mwrites.incrBy(statements.size());
         } catch (Exception e) {
