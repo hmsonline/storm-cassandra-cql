@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import clojure.lang.RT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,7 +231,7 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
 
     @SuppressWarnings("rawtypes")
     public void registerMetrics(Map conf, IMetricsContext context, String mapStateMetricName) {
-        int bucketSize = (Integer) (conf.get(Config.TOPOLOGY_BUILTIN_METRICS_BUCKET_SIZE_SECS));
+        int bucketSize = RT.intCast(conf.get(Config.TOPOLOGY_BUILTIN_METRICS_BUCKET_SIZE_SECS));
         String metricBaseName = "cassandra/" + mapStateMetricName;
 		_mreads = context.registerMetric(metricBaseName + "/readCount", new CountMetric(), bucketSize);
         _mwrites = context.registerMetric(metricBaseName + "/writeCount", new CountMetric(), bucketSize);
