@@ -1,3 +1,9 @@
+## 0.3.4
+
+* [#60][]: Bump cassandra-driver-core dependency to 2.1.9
+
+[#60]: https://github.com/hmsonline/storm-cassandra-cql/issues/60
+
 ## 0.3.3
 
 * [#55][]: Add support for QueryLogger into MapConfiguredCqlClientFactory
