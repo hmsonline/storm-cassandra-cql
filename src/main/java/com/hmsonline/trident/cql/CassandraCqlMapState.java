@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.datastax.driver.core.exceptions.FunctionExecutionException;
+import com.datastax.driver.core.exceptions.ReadFailureException;
+import com.datastax.driver.core.exceptions.WriteFailureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +36,6 @@ import com.datastax.driver.core.exceptions.InvalidConfigurationInQueryException;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
 import com.datastax.driver.core.exceptions.InvalidTypeException;
 import com.datastax.driver.core.exceptions.QueryExecutionException;
-import com.datastax.driver.core.exceptions.QueryTimeoutException;
 import com.datastax.driver.core.exceptions.QueryValidationException;
 import com.datastax.driver.core.exceptions.ReadTimeoutException;
 import com.datastax.driver.core.exceptions.SyntaxError;
@@ -212,7 +214,6 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
                 e instanceof InvalidQueryException ||
                 e instanceof InvalidTypeException ||
                 e instanceof QueryExecutionException ||
-                e instanceof QueryTimeoutException ||
                 e instanceof QueryValidationException ||
                 e instanceof ReadTimeoutException ||
                 e instanceof SyntaxError ||
@@ -221,7 +222,10 @@ public class CassandraCqlMapState<T> implements IBackingMap<T> {
                 e instanceof UnauthorizedException ||
                 e instanceof UnavailableException ||
                 e instanceof ReadTimeoutException ||
-                e instanceof WriteTimeoutException) {
+                e instanceof WriteTimeoutException ||
+                e instanceof ReadFailureException ||
+                e instanceof WriteFailureException ||
+                e instanceof FunctionExecutionException) {
             throw new ReportedFailedException(e);
         } else {
             throw new RuntimeException(e);

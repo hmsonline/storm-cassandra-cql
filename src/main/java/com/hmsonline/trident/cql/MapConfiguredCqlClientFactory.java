@@ -108,7 +108,7 @@ public class MapConfiguredCqlClientFactory extends CqlClientFactory {
     private void configureLoadBalancingPolicy() {
         final String dataCenterNameConfiguration = (String) configuration.get(TRIDENT_CASSANDRA_LOCAL_DATA_CENTER_NAME);
         if (StringUtils.isNotEmpty(dataCenterNameConfiguration)) {
-            final LoadBalancingPolicy loadBalancingPolicy = new DCAwareRoundRobinPolicy(dataCenterNameConfiguration);
+            final LoadBalancingPolicy loadBalancingPolicy = DCAwareRoundRobinPolicy.builder().withLocalDc(dataCenterNameConfiguration).build();
             builder = builder.withLoadBalancingPolicy(loadBalancingPolicy);
         }
     }
@@ -127,7 +127,7 @@ public class MapConfiguredCqlClientFactory extends CqlClientFactory {
         super.prepareCluster(cluster);
         final String threshold = (String) configuration.get(TRIDENT_CASSANDRA_QUERY_LOGGER_CONSTANT_THRESHOLD);
         if (StringUtils.isNotEmpty(threshold)) {
-            final QueryLogger logger = QueryLogger.builder(cluster)
+            final QueryLogger logger = QueryLogger.builder()
                     .withConstantThreshold(Long.parseLong(threshold))
                     .build();
             cluster.register(logger);
