@@ -1,3 +1,7 @@
+## 0.3.5
+
+* [#62][]: Upgrade cassandra driver to 3.0.0
+
 ## 0.3.4
 
 * [#60][]: Bump cassandra-driver-core dependency to 2.1.9
