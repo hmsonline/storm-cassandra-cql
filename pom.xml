@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.hmsonline</groupId>
 	<artifactId>storm-cassandra-cql</artifactId>
-	<version>0.3.6-SNAPSHOT</version>
+	<version>0.3.5</version>
 	<name>Storm Cassandra CQL Support</name>
 	<description>Storm Cassandra CQL Support</description>
 
@@ -17,7 +17,7 @@
 		<connection>scm:git:git@github.com:hmsonline/storm-cassandra-cql.git</connection>
 		<developerConnection>scm:git:git@github.com:hmsonline/storm-cassandra-cql.git</developerConnection>
 		<url>:git@github.com:hmsonline/storm-cassandra-cql.git</url>
-	  <tag>HEAD</tag>
+	  <tag>storm-cassandra-cql-0.3.5</tag>
   </scm>
         <distributionManagement>
                 <snapshotRepository>
