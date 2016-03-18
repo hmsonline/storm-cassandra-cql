@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.hmsonline</groupId>
 	<artifactId>storm-cassandra-cql</artifactId>
-	<version>0.3.8-SNAPSHOT</version>
+	<version>0.3.6-SNAPSHOT</version>
 	<name>Storm Cassandra CQL Support</name>
 	<description>Storm Cassandra CQL Support</description>
 
