@@ -1,4 +1,4 @@
-## 0.3.5
+## 0.3.10
 
 * [#62][]: Upgrade cassandra driver to 3.0.0
 
