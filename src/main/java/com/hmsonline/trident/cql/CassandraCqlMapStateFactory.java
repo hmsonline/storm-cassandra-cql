@@ -3,17 +3,17 @@ package com.hmsonline.trident.cql;
 import java.util.Map;
 
 import com.datastax.driver.core.Session;
-import storm.trident.state.State;
-import storm.trident.state.StateFactory;
-import storm.trident.state.StateType;
-import storm.trident.state.map.CachedMap;
-import storm.trident.state.map.MapState;
-import storm.trident.state.map.NonTransactionalMap;
-import storm.trident.state.map.OpaqueMap;
-import storm.trident.state.map.SnapshottableMap;
-import storm.trident.state.map.TransactionalMap;
-import backtype.storm.task.IMetricsContext;
-import backtype.storm.tuple.Values;
+import org.apache.storm.trident.state.State;
+import org.apache.storm.trident.state.StateFactory;
+import org.apache.storm.trident.state.StateType;
+import org.apache.storm.trident.state.map.CachedMap;
+import org.apache.storm.trident.state.map.MapState;
+import org.apache.storm.trident.state.map.NonTransactionalMap;
+import org.apache.storm.trident.state.map.OpaqueMap;
+import org.apache.storm.trident.state.map.SnapshottableMap;
+import org.apache.storm.trident.state.map.TransactionalMap;
+import org.apache.storm.task.IMetricsContext;
+import org.apache.storm.tuple.Values;
 
 import com.hmsonline.trident.cql.CassandraCqlMapState.Options;
 import com.hmsonline.trident.cql.mappers.CqlRowMapper;

@@ -1,26 +1,22 @@
 package com.hmsonline.trident.cql.incremental;
 
-import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
-import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
-import static com.hmsonline.trident.cql.example.sales.SalesMapper.KEYSPACE_NAME;
-import static com.hmsonline.trident.cql.example.sales.SalesMapper.KEY_NAME;
-import static com.hmsonline.trident.cql.example.sales.SalesMapper.TABLE_NAME;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.datastax.driver.core.querybuilder.Delete;
+import com.hmsonline.trident.cql.CqlTestEnvironment;
+import com.hmsonline.trident.cql.example.sales.SalesMapper;
+import org.apache.storm.trident.operation.builtin.Sum;
+import org.apache.storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.tuple.TridentTupleView;
+import org.apache.storm.tuple.Fields;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import storm.trident.operation.builtin.Sum;
-import storm.trident.testing.MockTridentTuple;
-import storm.trident.tuple.TridentTuple;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.datastax.driver.core.querybuilder.Delete;
-import com.hmsonline.trident.cql.CqlTestEnvironment;
-import com.hmsonline.trident.cql.example.sales.SalesMapper;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.delete;
+import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
+import static com.hmsonline.trident.cql.example.sales.SalesMapper.*;
 
 /**
  * Test that demonstrates how to construct and use conditional updates.
@@ -29,7 +25,7 @@ import com.hmsonline.trident.cql.example.sales.SalesMapper;
 public class IncrementalStateTest extends CqlTestEnvironment {
     private CassandraCqlIncrementalStateFactory<String, Number> stateFactory;
     private CassandraCqlIncrementalStateUpdater<String, Number> stateUpdater;
-    private static List<String> FIELDS = Arrays.asList("price", "state", "product");
+    private static Fields FIELDS = new Fields("price", "state", "product");
 
     public IncrementalStateTest() {
         super();
@@ -69,16 +65,16 @@ public class IncrementalStateTest extends CqlTestEnvironment {
         clearState();
         CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 5, 50);
         state.beginCommit(Long.MAX_VALUE);
-        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(100, "MD", "bike")));
-        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(50, "PA", "bike")));
-        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(10, "PA", "bike")));
+        state.aggregateValue(TridentTupleView.createFreshTuple(FIELDS, 100, "MD", "bike"));
+        state.aggregateValue(TridentTupleView.createFreshTuple(FIELDS, 50, "PA", "bike"));
+        state.aggregateValue(TridentTupleView.createFreshTuple(FIELDS, 10, "PA", "bike"));
         state.commit(Long.MAX_VALUE);
         assertValue("MD", 100);
         assertValue("PA", 60);
     }
 
     private void incrementState(CassandraCqlIncrementalState<String, Number> state) {
-        MockTridentTuple mockTuple = new MockTridentTuple(FIELDS, Arrays.asList(100, "MD", "bike"));
+        TridentTuple mockTuple = TridentTupleView.createFreshTuple(FIELDS, 100, "MD", "bike");
         List<TridentTuple> mockTuples = new ArrayList<TridentTuple>();
         mockTuples.add(mockTuple);
         state.beginCommit(Long.MAX_VALUE);

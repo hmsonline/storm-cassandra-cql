@@ -1,7 +1,7 @@
 package com.hmsonline.trident.cql.example.wordcount;
 
-import storm.trident.operation.CombinerAggregator;
-import storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.operation.CombinerAggregator;
+import org.apache.storm.trident.tuple.TridentTuple;
 
 
 public class IntegerCount implements CombinerAggregator<Integer> {

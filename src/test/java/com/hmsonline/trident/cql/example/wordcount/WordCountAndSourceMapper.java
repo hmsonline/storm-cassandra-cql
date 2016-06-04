@@ -3,7 +3,7 @@ package com.hmsonline.trident.cql.example.wordcount;
 import java.io.Serializable;
 import java.util.List;
 
-import storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;

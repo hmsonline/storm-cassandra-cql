@@ -1,9 +1,9 @@
 package com.hmsonline.trident.cql.example.simpleupdate;
 
-import backtype.storm.spout.SpoutOutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.tuple.Fields;
-import storm.trident.spout.ITridentSpout;
+import org.apache.storm.spout.SpoutOutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.trident.spout.ITridentSpout;
 
 import java.util.Map;
 
