@@ -5,10 +5,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import storm.trident.operation.CombinerAggregator;
-import storm.trident.state.State;
-import storm.trident.state.StateFactory;
-import backtype.storm.task.IMetricsContext;
+import org.apache.storm.trident.operation.CombinerAggregator;
+import org.apache.storm.trident.state.State;
+import org.apache.storm.trident.state.StateFactory;
+import org.apache.storm.task.IMetricsContext;
 
 import com.hmsonline.trident.cql.CqlClientFactory;
 import com.hmsonline.trident.cql.MapConfiguredCqlClientFactory;

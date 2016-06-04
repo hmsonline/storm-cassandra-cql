@@ -1,6 +1,6 @@
 package com.hmsonline.trident.cql.mappers;
 
-import storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.Statement;
 

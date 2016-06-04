@@ -2,7 +2,7 @@ package com.hmsonline.trident.cql.incremental;
 
 import java.util.List;
 
-import storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;

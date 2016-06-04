@@ -1,8 +1,8 @@
 package com.hmsonline.trident.cql.example.sales;
 
-import storm.trident.operation.TridentCollector;
-import storm.trident.spout.ITridentSpout.Emitter;
-import storm.trident.topology.TransactionAttempt;
+import org.apache.storm.trident.operation.TridentCollector;
+import org.apache.storm.trident.spout.ITridentSpout.Emitter;
+import org.apache.storm.trident.topology.TransactionAttempt;
 
 import java.io.Serializable;
 import java.util.ArrayList;

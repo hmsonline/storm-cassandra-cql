@@ -12,15 +12,15 @@ import com.datastax.driver.core.exceptions.WriteFailureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import storm.trident.state.OpaqueValue;
-import storm.trident.state.StateFactory;
-import storm.trident.state.StateType;
-import storm.trident.state.TransactionalValue;
-import storm.trident.state.map.IBackingMap;
-import backtype.storm.Config;
-import backtype.storm.metric.api.CountMetric;
-import backtype.storm.task.IMetricsContext;
-import backtype.storm.topology.ReportedFailedException;
+import org.apache.storm.trident.state.OpaqueValue;
+import org.apache.storm.trident.state.StateFactory;
+import org.apache.storm.trident.state.StateType;
+import org.apache.storm.trident.state.TransactionalValue;
+import org.apache.storm.trident.state.map.IBackingMap;
+import org.apache.storm.Config;
+import org.apache.storm.metric.api.CountMetric;
+import org.apache.storm.task.IMetricsContext;
+import org.apache.storm.topology.ReportedFailedException;
 
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.BatchStatement.Type;

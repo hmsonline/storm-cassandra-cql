@@ -3,12 +3,12 @@ package com.hmsonline.trident.cql.example.simpleupdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import storm.trident.Stream;
-import storm.trident.TridentTopology;
-import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.generated.StormTopology;
-import backtype.storm.tuple.Fields;
+import org.apache.storm.trident.Stream;
+import org.apache.storm.trident.TridentTopology;
+import org.apache.storm.Config;
+import org.apache.storm.LocalCluster;
+import org.apache.storm.generated.StormTopology;
+import org.apache.storm.tuple.Fields;
 
 import com.datastax.driver.core.ConsistencyLevel;
 import com.hmsonline.trident.cql.CassandraCqlStateFactory;

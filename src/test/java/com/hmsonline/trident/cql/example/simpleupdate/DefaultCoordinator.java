@@ -2,7 +2,7 @@ package com.hmsonline.trident.cql.example.simpleupdate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import storm.trident.spout.ITridentSpout.BatchCoordinator;
+import org.apache.storm.trident.spout.ITridentSpout.BatchCoordinator;
 
 import java.io.Serializable;
 

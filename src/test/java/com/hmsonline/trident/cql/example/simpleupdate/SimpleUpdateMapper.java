@@ -6,7 +6,7 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.update;
 
 import java.io.Serializable;
 
-import storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
