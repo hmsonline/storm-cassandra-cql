@@ -8,6 +8,7 @@ import com.datastax.driver.core.QueryOptions;
 import com.datastax.driver.core.SocketOptions;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 import com.datastax.driver.core.policies.LoadBalancingPolicy;
+import com.datastax.driver.core.policies.RetryPolicy;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,8 @@ public class MapConfiguredCqlClientFactory extends CqlClientFactory {
     public static final String TRIDENT_CASSANDRA_CONSISTENCY = "trident.cassandra.consistency";
     public static final String TRIDENT_CASSANDRA_SERIAL_CONSISTENCY = "trident.cassandra.serial.consistency";
     public static final String TRIDENT_CASSANDRA_QUERY_LOGGER_CONSTANT_THRESHOLD = "trident.cassandra.query.logger.constant.threshold";
+    public static final String TRIDENT_CASSANDRA_RETRY_POLICY_ENABLE = "trident.cassandra.retry.policy.enable";
+    public static final String TRIDENT_CASSANDRA_RETRY_POLICY = "trident.cassandra.retry.policy";
 
     final Map<Object,Object> configuration;
 
@@ -103,6 +106,12 @@ public class MapConfiguredCqlClientFactory extends CqlClientFactory {
         if (StringUtils.isNotEmpty(nameConfiguration)) {
             builder = builder.withClusterName(nameConfiguration);
         }
+
+        boolean retryPolicyEnabled = configuration.containsKey(TRIDENT_CASSANDRA_RETRY_POLICY_ENABLE) ? (boolean) configuration.get(TRIDENT_CASSANDRA_RETRY_POLICY_ENABLE) : false;
+        if (retryPolicyEnabled && configuration.containsKey(TRIDENT_CASSANDRA_RETRY_POLICY) && configuration.get(TRIDENT_CASSANDRA_RETRY_POLICY) != null) {
+            builder = builder.withRetryPolicy((RetryPolicy) configuration.get(TRIDENT_CASSANDRA_RETRY_POLICY));
+        }
+
     }
 
     private void configureLoadBalancingPolicy() {
