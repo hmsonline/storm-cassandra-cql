@@ -4,6 +4,8 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.datastax.driver.core.policies.DefaultRetryPolicy;
+import com.datastax.driver.core.policies.FallthroughRetryPolicy;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -22,6 +24,8 @@ public class MapConfiguredCqlClientFactoryTest extends CqlClientFactoryTestConst
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_LOCAL_DATA_CENTER_NAME, DATA_CENTER_NAME);
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CONSISTENCY, DEFAULT_CONSISTENCY_LEVEL.name());
         configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_SERIAL_CONSISTENCY, DEFAULT_SERIAL_CONSISTENCY_LEVEL.name());
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_RETRY_POLICY, FallthroughRetryPolicy.INSTANCE);
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_RETRY_POLICY_ENABLE, true);
 
         final CqlClientFactory factory =
                 new MapConfiguredCqlClientFactory(configuration);
@@ -39,6 +43,19 @@ public class MapConfiguredCqlClientFactoryTest extends CqlClientFactoryTestConst
         Assert.assertEquals(DEFAULT_CONSISTENCY_LEVEL, clusterBuilder.getConfiguration().getQueryOptions().getConsistencyLevel());
         Assert.assertEquals(DEFAULT_SERIAL_CONSISTENCY_LEVEL, clusterBuilder.getConfiguration().getQueryOptions().getSerialConsistencyLevel());
         Assert.assertEquals(ProtocolOptions.Compression.NONE, clusterBuilder.getConfiguration().getProtocolOptions().getCompression());
+        Assert.assertTrue(clusterBuilder.getConfiguration().getPolicies().getRetryPolicy() instanceof FallthroughRetryPolicy);
+    }
+
+    @Test
+    public void testDisableRetryPolicy() {
+        final Map<Object, Object> configuration = new HashMap<Object,Object>();
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_CQL_HOSTS, HOSTS);
+        configuration.put(MapConfiguredCqlClientFactory.TRIDENT_CASSANDRA_RETRY_POLICY, FallthroughRetryPolicy.INSTANCE);
+        final CqlClientFactory factory =
+                new MapConfiguredCqlClientFactory(configuration);
+
+        final Cluster.Builder clusterBuilder = factory.getClusterBuilder();
+        Assert.assertTrue(clusterBuilder.getConfiguration().getPolicies().getRetryPolicy() instanceof DefaultRetryPolicy);
     }
 
     @Test
