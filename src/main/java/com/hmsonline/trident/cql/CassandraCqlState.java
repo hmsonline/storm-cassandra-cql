@@ -3,10 +3,10 @@ package com.hmsonline.trident.cql;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.storm.trident.state.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import storm.trident.state.State;
 
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.BatchStatement.Type;

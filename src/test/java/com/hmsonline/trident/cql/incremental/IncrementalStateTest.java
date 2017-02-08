@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.storm.trident.operation.builtin.Sum;
+import org.apache.storm.trident.tuple.TridentTuple;
+import org.apache.storm.trident.tuple.TridentTupleView;
+import org.apache.storm.tuple.Fields;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import storm.trident.operation.builtin.Sum;
-import storm.trident.testing.MockTridentTuple;
-import storm.trident.tuple.TridentTuple;
 
 import com.datastax.driver.core.querybuilder.Delete;
 import com.hmsonline.trident.cql.CqlTestEnvironment;
@@ -27,62 +27,71 @@ import com.hmsonline.trident.cql.example.sales.SalesMapper;
  */
 @RunWith(JUnit4.class)
 public class IncrementalStateTest extends CqlTestEnvironment {
-    private CassandraCqlIncrementalStateFactory<String, Number> stateFactory;
-    private CassandraCqlIncrementalStateUpdater<String, Number> stateUpdater;
-    private static List<String> FIELDS = Arrays.asList("price", "state", "product");
+	private CassandraCqlIncrementalStateFactory<String, Number> stateFactory;
+	private CassandraCqlIncrementalStateUpdater<String, Number> stateUpdater;
+	private static List<String> FIELDS = Arrays.asList("price", "state", "product");
 
-    public IncrementalStateTest() {
-        super();
-        SalesMapper mapper = new SalesMapper();
-        stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper);
-        stateFactory.setCqlClientFactory(clientFactory);
-        stateUpdater = new CassandraCqlIncrementalStateUpdater<String, Number>();
-    }
+	public IncrementalStateTest() {
+		super();
+		SalesMapper mapper = new SalesMapper();
+		stateFactory = new CassandraCqlIncrementalStateFactory<String, Number>(new Sum(), mapper);
+		stateFactory.setCqlClientFactory(clientFactory);
+		stateUpdater = new CassandraCqlIncrementalStateUpdater<String, Number>();
+	}
 
-    private void clearState() {
-        Delete deleteStatement = delete().all().from(KEYSPACE_NAME, TABLE_NAME);
-        deleteStatement.where(eq(KEY_NAME, "MD"));
-        clientFactory.getSession().execute(deleteStatement);
-    }
- 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testStateUpdates() throws Exception {
-        clearState();
+	private void clearState() {
+		Delete deleteStatement = delete().all().from(KEYSPACE_NAME, TABLE_NAME);
+		deleteStatement.where(eq(KEY_NAME, "MD"));
+		clientFactory.getSession().execute(deleteStatement);
+	}
 
-        // Let's get some initial state in the database
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testStateUpdates() throws Exception {
+		clearState();
 
-        CassandraCqlIncrementalState<String, Number> state = 
-                (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 5, 50);
-        incrementState(state);
-        assertValue("MD", 100);
+		// Let's get some initial state in the database
 
-        CassandraCqlIncrementalState<String, Number> state1 =
-                (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 55, 122);
-        incrementState(state1);
-        assertValue("MD", 200);
-    }
+		CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory
+				.makeState(configuration, null, 5, 50);
+		incrementState(state);
+		assertValue("MD", 100);
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testValueAggregations() {
-        clearState();
-        CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory.makeState(configuration, null, 5, 50);
-        state.beginCommit(Long.MAX_VALUE);
-        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(100, "MD", "bike")));
-        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(50, "PA", "bike")));
-        state.aggregateValue(new MockTridentTuple(FIELDS, Arrays.asList(10, "PA", "bike")));
-        state.commit(Long.MAX_VALUE);
-        assertValue("MD", 100);
-        assertValue("PA", 60);
-    }
+		CassandraCqlIncrementalState<String, Number> state1 = (CassandraCqlIncrementalState<String, Number>) stateFactory
+				.makeState(configuration, null, 55, 122);
+		incrementState(state1);
+		assertValue("MD", 200);
+	}
 
-    private void incrementState(CassandraCqlIncrementalState<String, Number> state) {
-        MockTridentTuple mockTuple = new MockTridentTuple(FIELDS, Arrays.asList(100, "MD", "bike"));
-        List<TridentTuple> mockTuples = new ArrayList<TridentTuple>();
-        mockTuples.add(mockTuple);
-        state.beginCommit(Long.MAX_VALUE);
-        stateUpdater.updateState(state, mockTuples, null);
-        state.commit(Long.MAX_VALUE);
-    }
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testValueAggregations() {
+		clearState();
+		CassandraCqlIncrementalState<String, Number> state = (CassandraCqlIncrementalState<String, Number>) stateFactory
+				.makeState(configuration, null, 5, 50);
+		state.beginCommit(Long.MAX_VALUE);
+		List<Object> valueList1 = new ArrayList<Object>(3);
+		valueList1.addAll(Arrays.asList(100, "MD", "bike"));
+		state.aggregateValue(new TridentTupleView.FreshOutputFactory(new Fields(FIELDS)).create(valueList1));
+		List<Object> valueList2 = new ArrayList<Object>(3);
+		valueList2.addAll(Arrays.asList(50, "PA", "bike"));
+		state.aggregateValue(new TridentTupleView.FreshOutputFactory(new Fields(FIELDS)).create(valueList2));
+		List<Object> valueList3 = new ArrayList<Object>(3);
+		valueList3.addAll(Arrays.asList(10, "PA", "bike"));
+		state.aggregateValue(new TridentTupleView.FreshOutputFactory(new Fields(FIELDS)).create(valueList3));
+		state.commit(Long.MAX_VALUE);
+		assertValue("MD", 100);
+		assertValue("PA", 60);
+	}
+
+	private void incrementState(CassandraCqlIncrementalState<String, Number> state) {
+		List<Object> valueList1 = new ArrayList<Object>(3);
+		valueList1.addAll(Arrays.asList(100, "MD", "bike"));
+		TridentTuple mockTuple = new TridentTupleView.FreshOutputFactory(new Fields(FIELDS)).create(valueList1);
+		List<TridentTuple> mockTuples = new ArrayList<TridentTuple>();
+		mockTuples.add(mockTuple);
+		state.beginCommit(Long.MAX_VALUE);
+		stateUpdater.updateState(state, mockTuples, null);
+		state.commit(Long.MAX_VALUE);
+	}
 }
